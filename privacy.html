@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — relay4agents</title>
+  <meta name="description" content="relay4agents privacy policy. We don't collect, store, or sell your data.">
+  <meta name="theme-color" content="#0a0a0f">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="/" class="nav-brand">
+      <img src="img/icon.svg" alt="relay4agents">
+      relay4agents
+    </a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/support.html">Support</a>
+      <a href="https://github.com/arunrlverma/relay4agents" target="_blank">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+<div class="legal">
+
+<h1>Privacy Policy</h1>
+<p class="updated">Last updated: January 30, 2026</p>
+
+<h2>The Short Version</h2>
+<p><strong>We don't collect your data. We don't store your data. We don't sell your data.</strong></p>
+<p>relay4agents is designed so that your sensitive information never leaves your device without your explicit, biometric approval — and even then, it only exists in transit for seconds before being permanently deleted.</p>
+
+<h2>What Data the App Accesses</h2>
+<p>The relay4agents iOS app may access the following data on your device, <strong>only with your permission</strong>:</p>
+<ul>
+  <li><strong>Apple HealthKit data</strong> — steps, heart rate, HRV, sleep, workouts, weight, and other health metrics you choose to share</li>
+  <li><strong>Secure Vault items</strong> — credit cards, identity, bank accounts, SSN, and custom items that you manually enter and store in the app</li>
+  <li><strong>Face ID / Touch ID</strong> — used solely to authenticate vault data sharing requests</li>
+  <li><strong>Push notification token</strong> — used to deliver vault request notifications to your device</li>
+</ul>
+
+<h2>How Data is Stored</h2>
+
+<h3>On Your Device (Local Only)</h3>
+<ul>
+  <li><strong>Vault items</strong> are stored in the iOS Keychain with <code>kSecAttrAccessibleWhenUnlockedThisDeviceOnly</code> protection. They never leave your device unless you explicitly approve a request with Face ID.</li>
+  <li><strong>Health data</strong> remains in Apple HealthKit. The app reads it on-demand and transmits it through the relay to your configured agent.</li>
+  <li><strong>Pairing credentials</strong> (relay URL, channel ID, auth token) are stored in the iOS Keychain.</li>
+  <li><strong>Audit logs</strong> (metadata only — timestamps and request types, no sensitive values) are stored locally on-device.</li>
+</ul>
+
+<h3>On the Relay Server</h3>
+<ul>
+  <li>The relay server is a <strong>stateless HTTP queue</strong>. It holds messages in memory only.</li>
+  <li><strong>Health data</strong> messages expire after 5 minutes if not pulled by the agent.</li>
+  <li><strong>Vault data</strong> (approved sensitive information) expires after <strong>60 seconds</strong> and is permanently deleted from memory.</li>
+  <li>The relay has <strong>no database, no disk storage, no logs of message content</strong>.</li>
+  <li>When the relay server restarts, all in-memory data is lost. This is by design.</li>
+</ul>
+
+<h3>On Third-Party Servers</h3>
+<ul>
+  <li><strong>Apple Push Notification service (APNs)</strong> — we send push notifications through Apple's servers. Apple's privacy policy governs their handling of notification delivery metadata.</li>
+  <li><strong>No other third parties</strong> receive your data. We do not use analytics, advertising, tracking, or any third-party SDKs that collect user data.</li>
+</ul>
+
+<h2>What We Don't Do</h2>
+<ul>
+  <li>We <strong>don't collect</strong> personal information</li>
+  <li>We <strong>don't store</strong> health data or vault data on any server</li>
+  <li>We <strong>don't sell</strong> or share data with third parties</li>
+  <li>We <strong>don't track</strong> you with analytics or advertising</li>
+  <li>We <strong>don't create</strong> user accounts or profiles</li>
+  <li>We <strong>don't log</strong> message content on the relay server</li>
+</ul>
+
+<h2>Self-Hosted Relay</h2>
+<p>The relay server is <strong>open source</strong>. You can host your own instance, audit the code, and verify that nothing is stored. The source code is available at <a href="https://github.com/arunrlverma/relay4agents">github.com/arunrlverma/relay4agents</a>.</p>
+
+<h2>HealthKit Data</h2>
+<p>relay4agents accesses HealthKit data solely to transmit health metrics to your configured AI agent through the relay. We comply with Apple's HealthKit guidelines:</p>
+<ul>
+  <li>HealthKit data is <strong>not used for advertising</strong> or sold to data brokers</li>
+  <li>HealthKit data is <strong>not stored on external servers</strong> beyond the in-memory relay transit (5 min TTL)</li>
+  <li>HealthKit data is <strong>only shared with your configured agent</strong>, which you pair with explicitly</li>
+  <li>You can revoke HealthKit access at any time in iOS Settings → Privacy → Health</li>
+</ul>
+
+<h2>Security</h2>
+<ul>
+  <li>All communication between the app and relay uses <strong>HTTPS/TLS</strong></li>
+  <li>Requests are signed with <strong>HMAC-SHA256</strong> with replay protection (timestamps + nonces)</li>
+  <li>Vault data requires <strong>Face ID or Touch ID</strong> for every approval</li>
+  <li>Vault responses have a <strong>60-second auto-expiry</strong></li>
+  <li>The relay server uses <strong>timing-safe comparisons</strong> for all authentication checks</li>
+</ul>
+
+<h2>Children's Privacy</h2>
+<p>relay4agents is not directed at children under 13. We do not knowingly collect information from children.</p>
+
+<h2>Changes to This Policy</h2>
+<p>We may update this privacy policy from time to time. Changes will be posted on this page with an updated "Last updated" date. Continued use of the app after changes constitutes acceptance of the updated policy.</p>
+
+<h2>Contact</h2>
+<p>If you have questions about this privacy policy or the app, please contact:</p>
+<p>
+  <strong>Arun Verma</strong><br>
+  Email: <a href="mailto:arun@relay4agents.com">arun@relay4agents.com</a><br>
+  GitHub: <a href="https://github.com/arunrlverma/relay4agents" target="_blank">github.com/arunrlverma/relay4agents</a>
+</p>
+
+</div>
+</div>
+
+<footer>
+  <div class="container">
+    <span class="footer-copy">© 2026 Arun Verma. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms of Service</a>
+      <a href="/support.html">Support</a>
+      <a href="https://github.com/arunrlverma/relay4agents" target="_blank">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

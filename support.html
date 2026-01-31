@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support — relay4agents</title>
+  <meta name="description" content="Get help with relay4agents.">
+  <meta name="theme-color" content="#0a0a0f">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="/" class="nav-brand">
+      <img src="img/icon.svg" alt="relay4agents">
+      relay4agents
+    </a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="https://github.com/arunrlverma/relay4agents" target="_blank">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+<div class="legal">
+
+<h1>Support</h1>
+<p class="updated">We're here to help.</p>
+
+<h2>Common Questions</h2>
+
+<h3>How do I pair the app with my agent?</h3>
+<p>After installing the app, tap "Connect" and paste the pairing JSON provided by your agent setup. This contains your relay URL, channel ID, and authentication token. The app will verify the connection and begin syncing.</p>
+
+<h3>Why isn't my health data syncing?</h3>
+<ul>
+  <li>Make sure you've granted HealthKit permissions in iOS Settings → Privacy → Health → relay4agents</li>
+  <li>Check that the app is paired (green status indicator on the dashboard)</li>
+  <li>Try toggling the sync switch off and on</li>
+  <li>If your relay is self-hosted, verify it's running and accessible</li>
+</ul>
+
+<h3>I approved a vault request but my agent didn't get the data</h3>
+<p>Vault responses expire after 60 seconds. Make sure your agent is polling for responses. If you're self-hosting the relay, check that it's running and the agent's pull request is reaching it.</p>
+
+<h3>How do I remove my data?</h3>
+<ul>
+  <li><strong>Vault items:</strong> Open the app → Vault tab → swipe to delete individual items, or unpair to clear all credentials</li>
+  <li><strong>Health data:</strong> The app reads from HealthKit but doesn't store copies. Revoke access in iOS Settings → Privacy → Health</li>
+  <li><strong>Relay data:</strong> There is none. The relay stores nothing to disk. Restarting the relay clears all in-memory data.</li>
+</ul>
+
+<h3>Can I self-host the relay?</h3>
+<p>Yes! The relay is open source. Clone the repo, run <code>npm install && npx tsx src/relay-node.ts</code>, or deploy to any cloud provider. See the <a href="https://github.com/arunrlverma/relay4agents">GitHub repo</a> for deployment instructions.</p>
+
+<h3>Is my data encrypted?</h3>
+<ul>
+  <li><strong>In transit:</strong> All communication uses HTTPS/TLS</li>
+  <li><strong>On device:</strong> Vault items are stored in the iOS Keychain with hardware-backed encryption</li>
+  <li><strong>On the relay:</strong> Data exists only in memory and auto-expires</li>
+</ul>
+
+<h2>Report a Bug</h2>
+<p>Found a bug? Please open an issue on GitHub:</p>
+<p><a href="https://github.com/arunrlverma/relay4agents/issues" target="_blank">github.com/arunrlverma/relay4agents/issues</a></p>
+
+<h2>Security Issues</h2>
+<p>If you've found a security vulnerability, please report it responsibly. <strong>Do not open a public issue.</strong> Instead, email us directly:</p>
+<p><a href="mailto:arun@relay4agents.com">arun@relay4agents.com</a></p>
+
+<h2>Contact</h2>
+<p>For general questions, feedback, or anything else:</p>
+<p>
+  <strong>Arun Verma</strong><br>
+  Email: <a href="mailto:arun@relay4agents.com">arun@relay4agents.com</a><br>
+  GitHub: <a href="https://github.com/arunrlverma/relay4agents" target="_blank">github.com/arunrlverma/relay4agents</a>
+</p>
+
+</div>
+</div>
+
+<footer>
+  <div class="container">
+    <span class="footer-copy">© 2026 Arun Verma. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms of Service</a>
+      <a href="/support.html">Support</a>
+      <a href="https://github.com/arunrlverma/relay4agents" target="_blank">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

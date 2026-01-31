@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>relay4agents — Secure bridge between AI agents and your phone</title>
+  <meta name="description" content="Give your AI agent access to health data, identity, and payments — with biometric approval for every request. Your data never leaves your phone without Face ID.">
+  <meta name="theme-color" content="#0a0a0f">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<!-- ── Nav ──────────────────────────────────────────────── -->
+<nav>
+  <div class="container">
+    <a href="/" class="nav-brand">
+      <img src="img/icon.svg" alt="relay4agents">
+      relay4agents
+    </a>
+    <div class="nav-links">
+      <a href="#how-it-works">How It Works</a>
+      <a href="#features">Features</a>
+      <a href="#vault">Vault</a>
+      <a href="https://github.com/arunrlverma/relay4agents" target="_blank">GitHub</a>
+      <a href="#download" class="nav-cta">Download</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ─────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container">
+    <h1>Your phone. <span>Your agent.</span><br>Zero trust required.</h1>
+    <p>relay4agents bridges AI agents and your iPhone — health data, identity, payments — with biometric approval for every single request.</p>
+    <div class="hero-buttons">
+      <a href="#download" class="btn btn-primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        Download Free
+      </a>
+      <a href="https://github.com/arunrlverma/relay4agents" class="btn btn-secondary" target="_blank">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        View Source
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── How It Works ─────────────────────────────────────── -->
+<section id="how-it-works">
+  <div class="container section-center">
+    <p class="section-label">How It Works</p>
+    <h2 class="section-title">A stateless pipe. Nothing stored.</h2>
+    <p class="section-desc">Your agent sends a request. Your phone shows it. You approve with Face ID. Data flows through — then it's gone. The relay stores nothing.</p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-icon">🤖</div>
+        <h3>Agent Requests</h3>
+        <p>Your AI agent needs data to complete a task — health metrics, identity, or payment info.</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon" style="background: var(--accent-glow); border-color: var(--accent);">📬</div>
+        <h3>Relay Delivers</h3>
+        <p>The HTTP relay forwards the request to your phone via push notification. Nothing is stored.</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">📱</div>
+        <h3>You Approve</h3>
+        <p>See exactly what's requested and why. Pick which data to share. Approve with Face ID.</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">✅</div>
+        <h3>Done. Gone.</h3>
+        <p>Data reaches the agent, gets used for the task, and auto-expires in 60 seconds.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Architecture ─────────────────────────────────────── -->
+<section style="padding-top: 0;">
+  <div class="container">
+    <div class="arch-diagram">
+      <div class="arch-flow">
+        <div class="arch-node">
+          <h4>📱 iPhone App</h4>
+          <p>HealthKit · Keychain · Face ID</p>
+        </div>
+        <div class="arch-arrow">⟶</div>
+        <div class="arch-node relay">
+          <h4>📬 Relay</h4>
+          <p>Stateless HTTP · In-memory only</p>
+        </div>
+        <div class="arch-arrow">⟶</div>
+        <div class="arch-node">
+          <h4>🤖 AI Agent</h4>
+          <p>Any agent · Any framework</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ─────────────────────────────────────────── -->
+<section id="features">
+  <div class="container">
+    <p class="section-label">Features</p>
+    <h2 class="section-title">Built for privacy. Designed for agents.</h2>
+    <p class="section-desc">Everything an AI agent needs to work with your real-world data, with you in full control.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">💓</div>
+        <h3>Health Data Sync</h3>
+        <p>Steps, heart rate, HRV, sleep, workouts, weight — streamed from Apple HealthKit in real time. Your agent knows how you're doing.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔐</div>
+        <h3>Secure Vault</h3>
+        <p>Store credit cards, SSN, bank accounts, and identity on-device in the iOS Keychain. Share only when asked, only with Face ID.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🚫</div>
+        <h3>Zero Cloud Storage</h3>
+        <p>The relay is a stateless pipe. No database, no logs, no persistence. Data exists in memory for seconds, then it's gone.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Pure HTTP</h3>
+        <p>No WebSockets, no SDKs, no vendor lock-in. Push and pull with curl. Works with any agent framework, any language.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔔</div>
+        <h3>Push Notifications</h3>
+        <p>Vault requests arrive as push notifications via APNs. Tap to review, Face ID to approve. No polling, no waiting.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>HMAC Signed</h3>
+        <p>Every request is signed with HMAC-SHA256. Replay protection with timestamps and nonces. No unsigned requests accepted.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Vault ────────────────────────────────────────────── -->
+<section id="vault">
+  <div class="container section-center">
+    <p class="section-label">Secure Vault</p>
+    <h2 class="section-title">Your agent can fill forms. You hold the keys.</h2>
+    <p class="section-desc">Tax forms, checkouts, signups — your agent handles them. Sensitive data comes from your phone, approved by your face, and expires in 60 seconds.</p>
+
+    <div class="vault-features">
+      <div class="vault-item">
+        <div class="icon">💳</div>
+        <div>
+          <h4>Payment</h4>
+          <p>Card number, expiry, CVV, billing zip</p>
+        </div>
+      </div>
+      <div class="vault-item">
+        <div class="icon">🪪</div>
+        <div>
+          <h4>Identity</h4>
+          <p>Name, email, phone, address, DOB</p>
+        </div>
+      </div>
+      <div class="vault-item">
+        <div class="icon">🏦</div>
+        <div>
+          <h4>Bank Account</h4>
+          <p>Routing, account number, bank name</p>
+        </div>
+      </div>
+      <div class="vault-item">
+        <div class="icon">🔒</div>
+        <div>
+          <h4>SSN</h4>
+          <p>Social security number — biometric only</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Code Example ─────────────────────────────────────── -->
+<section id="developers">
+  <div class="container">
+    <div class="code-section">
+      <div>
+        <p class="section-label">For Developers</p>
+        <h2 class="section-title">Three API calls. That's it.</h2>
+        <p class="section-desc">Push a request, pull the response. Standard HTTP. No SDK required. Works from bash, Python, Node, or any language with HTTP support.</p>
+        <a href="https://github.com/arunrlverma/relay4agents" class="btn btn-secondary" target="_blank">Read the Docs →</a>
+      </div>
+      <div class="code-block">
+<pre><span class="comment"># 1. Request identity data</span>
+<span class="cmd">curl</span> -X POST \
+  -H <span class="string">"Authorization: Bearer $SECRET"</span> \
+  -d <span class="string">'{
+    "type": "vault_request",
+    "requestType": "identity",
+    "reason": "Fill shipping address"
+  }'</span> \
+  <span class="string">"$RELAY/channel/$CH/push?role=gateway"</span>
+
+<span class="comment"># 2. User approves with Face ID...</span>
+
+<span class="comment"># 3. Pull the response</span>
+<span class="cmd">curl</span> -H <span class="string">"Authorization: Bearer $SECRET"</span> \
+  <span class="string">"$RELAY/channel/$CH/pull?role=gateway&wait=30"</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ──────────────────────────────────────────────── -->
+<section class="cta-section" id="download">
+  <div class="container">
+    <h2>Free. Open source. <span style="color: var(--accent);">Yours.</span></h2>
+    <p>Download the app, self-host the relay, and give your agent<br>access to the real world — on your terms.</p>
+    <div class="hero-buttons">
+      <a href="#" class="btn btn-primary" id="appstore-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        App Store — Coming Soon
+      </a>
+      <a href="https://github.com/arunrlverma/relay4agents" class="btn btn-secondary" target="_blank">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        View on GitHub
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ──────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <span class="footer-copy">© 2026 Arun Verma. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms of Service</a>
+      <a href="/support.html">Support</a>
+      <a href="https://github.com/arunrlverma/relay4agents" target="_blank">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
