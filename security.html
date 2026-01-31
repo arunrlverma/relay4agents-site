@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Architecture — relay4agents</title>
+  <meta name="description" content="How relay4agents and ClawVault protect your data. Stateless relay, biometric gates, HMAC signing, and end-to-end security architecture.">
+  <meta name="theme-color" content="#0a0a0f">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="/" class="nav-brand">
+      <img src="img/icon.svg" alt="relay4agents">
+      relay4agents
+    </a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/security.html">Security</a>
+      <a href="/support.html">Support</a>
+      <a href="https://github.com/arunrlverma/relay4agents" target="_blank">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+<div class="legal">
+
+<h1>Security Architecture</h1>
+<p class="updated">How relay4agents protects your data at every layer.</p>
+
+<!-- ── Overview ─────────────────────────────────────────── -->
+<div class="security-hero">
+  <div class="security-hero-inner">
+    <div class="security-stat">
+      <span class="security-stat-value">0</span>
+      <span class="security-stat-label">Databases</span>
+    </div>
+    <div class="security-stat">
+      <span class="security-stat-value">60s</span>
+      <span class="security-stat-label">Max TTL</span>
+    </div>
+    <div class="security-stat">
+      <span class="security-stat-value">100%</span>
+      <span class="security-stat-label">Biometric Gated</span>
+    </div>
+    <div class="security-stat">
+      <span class="security-stat-value">OSS</span>
+      <span class="security-stat-label">Fully Auditable</span>
+    </div>
+  </div>
+</div>
+
+<h2>Architecture Overview</h2>
+<p>relay4agents is a <strong>stateless relay</strong>. There is no database — not SQL, not NoSQL, not Redis, not a file on disk. The relay holds messages in memory only. Data exists for seconds, then it's gone. A server restart produces a completely clean slate. This isn't a limitation — it's the core design principle.</p>
+
+<!-- ── End-to-End Flow ─────────────────────────────────── -->
+<h2>End-to-End Flow</h2>
+<p>Every data request follows the same path, with biometric approval as the mandatory gate:</p>
+
+<div class="security-flow">
+  <div class="security-flow-step">
+    <div class="security-flow-icon">🤖</div>
+    <div class="security-flow-text">
+      <strong>Agent sends request</strong>
+      <span>HMAC-signed HTTP POST to the relay</span>
+    </div>
+  </div>
+  <div class="security-flow-arrow">↓</div>
+  <div class="security-flow-step">
+    <div class="security-flow-icon">📬</div>
+    <div class="security-flow-text">
+      <strong>Relay queues &amp; pushes</strong>
+      <span>In-memory queue + APNs push notification</span>
+    </div>
+  </div>
+  <div class="security-flow-arrow">↓</div>
+  <div class="security-flow-step">
+    <div class="security-flow-icon">📱</div>
+    <div class="security-flow-text">
+      <strong>iPhone receives notification</strong>
+      <span>User sees exactly what's requested and why</span>
+    </div>
+  </div>
+  <div class="security-flow-arrow">↓</div>
+  <div class="security-flow-step">
+    <div class="security-flow-icon" style="background: var(--accent-glow); border-color: var(--accent);">🔐</div>
+    <div class="security-flow-text">
+      <strong>Face ID / Touch ID approval</strong>
+      <span>Biometric gate — no PIN fallback for vault data</span>
+    </div>
+  </div>
+  <div class="security-flow-arrow">↓</div>
+  <div class="security-flow-step">
+    <div class="security-flow-icon">✅</div>
+    <div class="security-flow-text">
+      <strong>Data flows back → auto-expires</strong>
+      <span>Response available for 60 seconds, then permanently gone</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── HMAC Signing ────────────────────────────────────── -->
+<h2>HMAC-SHA256 Signing</h2>
+<p>Every request to the relay is signed with <strong>HMAC-SHA256</strong>. The signing payload includes timestamps and nonces to prevent replay attacks. The relay performs timing-safe comparison on every signature and rejects:</p>
+<ul>
+  <li>Requests with missing or invalid signatures</li>
+  <li>Requests with expired timestamps (clock skew tolerance is tight)</li>
+  <li>Requests with previously-seen nonces</li>
+  <li>Any unsigned request — period</li>
+</ul>
+
+<!-- ── Biometric Gates ─────────────────────────────────── -->
+<h2>Biometric Gates</h2>
+<p>All vault access in ClawVault requires <strong>Face ID or Touch ID</strong>. This is non-negotiable:</p>
+<ul>
+  <li>Every vault data share requires a fresh biometric authentication</li>
+  <li>There is <strong>no PIN fallback</strong> for vault data — biometric or nothing</li>
+  <li>The iOS app uses <code>LAPolicy.deviceOwnerAuthenticationWithBiometrics</code>, not the weaker <code>deviceOwnerAuthentication</code> that allows passcode</li>
+  <li>Failed biometric = request denied. The agent receives a rejection, not the data.</li>
+</ul>
+
+<!-- ── Keychain Protection ─────────────────────────────── -->
+<h2>Keychain Protection</h2>
+<p>Vault items (credit cards, SSN, bank accounts, identity) are stored in the <strong>iOS Keychain</strong> with the strongest available protection:</p>
+<ul>
+  <li>Access class: <code>kSecAttrAccessibleWhenUnlockedThisDeviceOnly</code></li>
+  <li><strong>Not synced</strong> to iCloud Keychain — data stays on your physical device</li>
+  <li><strong>Not included</strong> in device backups (iTunes or iCloud)</li>
+  <li>Protected by the Secure Enclave on devices that support it</li>
+  <li>If the device is wiped, stolen, or factory reset — vault data is gone</li>
+</ul>
+
+<!-- ── Relay Statelessness ─────────────────────────────── -->
+<h2>Relay Statelessness</h2>
+<p>The relay server is <strong>aggressively stateless</strong>:</p>
+<ul>
+  <li><strong>In-memory message queues</strong> — no database, no file system, no persistence layer of any kind</li>
+  <li><strong>Server restart = clean slate</strong> — all queued messages are lost on restart, by design</li>
+  <li><strong>No content logs</strong> — the relay never logs the content of messages passing through it</li>
+  <li><strong>No user accounts</strong> — there are no profiles, no registration, no stored credentials</li>
+  <li>The relay's only job: receive a message, hold it in RAM briefly, deliver it, delete it</li>
+</ul>
+
+<!-- ── Channel Isolation ───────────────────────────────── -->
+<h2>Channel Isolation</h2>
+<p>Each device-agent pair communicates through a <strong>unique channel</strong>:</p>
+<ul>
+  <li>Every channel has its own UUID and authentication token</li>
+  <li>Channels are cryptographically isolated — there is no mechanism to read another channel's messages</li>
+  <li>Auth tokens are generated during pairing and stored in the iOS Keychain</li>
+  <li>Compromising one channel does not affect any other channel on the relay</li>
+  <li>You can revoke a channel instantly by unpairing from the app</li>
+</ul>
+
+<!-- ── Self-Hosting ────────────────────────────────────── -->
+<h2>Self-Hosting</h2>
+<p>The relay is <strong>fully open source</strong>. You don't have to trust our hosted instance — you can run your own:</p>
+<ul>
+  <li>Deploy to any cloud provider (Fly.io, Railway, AWS, DigitalOcean, etc.)</li>
+  <li>Run on your local machine or home server</li>
+  <li>Audit every line of code: <a href="https://github.com/arunrlverma/relay4agents" target="_blank">github.com/arunrlverma/relay4agents</a></li>
+  <li>Point ClawVault at your custom relay URL during pairing</li>
+  <li>Full control over your infrastructure, your rules</li>
+</ul>
+
+<!-- ── Health Data ─────────────────────────────────────── -->
+<h2>Health Data</h2>
+<p>ClawVault reads health metrics from Apple HealthKit with <strong>read-only access</strong>:</p>
+<ul>
+  <li>The app never writes to HealthKit — it only reads metrics you've authorized</li>
+  <li>Data is streamed in batches through the relay, not stored on it</li>
+  <li>Your agent can request specific metrics (steps, heart rate, HRV, sleep, etc.)</li>
+  <li>Health data batches expire on the relay after 5 minutes if not pulled</li>
+  <li>Compliant with Apple's HealthKit guidelines — data is never used for advertising or sold</li>
+  <li>You can revoke HealthKit access at any time in iOS Settings → Privacy → Health</li>
+</ul>
+
+<!-- ── TTL & Auto-Expiry ───────────────────────────────── -->
+<h2>TTL &amp; Auto-Expiry</h2>
+<p>Nothing lingers on the relay. Every piece of data has a hard expiration:</p>
+<ul>
+  <li><strong>Vault responses:</strong> 60-second TTL. After 60 seconds, the data is permanently deleted from memory.</li>
+  <li><strong>Health data batches:</strong> Expire on pull, or after 5 minutes if not pulled.</li>
+  <li><strong>Push requests:</strong> Expire from the queue if not delivered within their TTL.</li>
+  <li>There is no way to retrieve expired data — it doesn't exist anymore.</li>
+  <li>TTLs are enforced server-side. The agent cannot extend them.</li>
+</ul>
+
+<!-- ── Summary ─────────────────────────────────────────── -->
+<h2>Summary</h2>
+<p>relay4agents is designed around a single principle: <strong>your data should only exist where it needs to, for as long as it needs to.</strong> The relay is a pipe, not a vault. Your phone is the vault — protected by biometrics, Keychain encryption, and your explicit approval for every single request.</p>
+<p>Questions about our security architecture? Email <a href="mailto:arun@relay4agents.com">arun@relay4agents.com</a>. Security vulnerabilities should be reported privately — <strong>do not open a public issue</strong>.</p>
+
+</div>
+</div>
+
+<footer>
+  <div class="container">
+    <span class="footer-copy">© 2026 Arun Verma. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms of Service</a>
+      <a href="/support.html">Support</a>
+      <a href="/security.html">Security</a>
+      <a href="https://github.com/arunrlverma/relay4agents" target="_blank">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

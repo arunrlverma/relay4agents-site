@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Support — relay4agents</title>
-  <meta name="description" content="Get help with relay4agents.">
+  <title>Support — ClawVault / relay4agents</title>
+  <meta name="description" content="Get help with ClawVault and the relay4agents infrastructure.">
   <meta name="theme-color" content="#0a0a0f">
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
@@ -20,6 +20,7 @@
     <div class="nav-links">
       <a href="/">Home</a>
       <a href="/privacy.html">Privacy</a>
+      <a href="/security.html">Security</a>
       <a href="https://github.com/arunrlverma/relay4agents" target="_blank">GitHub</a>
     </div>
   </div>
@@ -33,12 +34,12 @@
 
 <h2>Common Questions</h2>
 
-<h3>How do I pair the app with my agent?</h3>
-<p>After installing the app, tap "Connect" and paste the pairing JSON provided by your agent setup. This contains your relay URL, channel ID, and authentication token. The app will verify the connection and begin syncing.</p>
+<h3>How do I pair ClawVault with my agent?</h3>
+<p>After installing ClawVault, the app displays a pairing code (e.g., <strong>CLAW-XXXX</strong>). Simply tell your AI agent the code — it will claim it and establish a secure channel instantly. No QR codes, no manual config, no pasting JSON.</p>
 
 <h3>Why isn't my health data syncing?</h3>
 <ul>
-  <li>Make sure you've granted HealthKit permissions in iOS Settings → Privacy → Health → relay4agents</li>
+  <li>Make sure you've granted HealthKit permissions in iOS Settings → Privacy → Health → ClawVault</li>
   <li>Check that the app is paired (green status indicator on the dashboard)</li>
   <li>Try toggling the sync switch off and on</li>
   <li>If your relay is self-hosted, verify it's running and accessible</li>
@@ -49,8 +50,8 @@
 
 <h3>How do I remove my data?</h3>
 <ul>
-  <li><strong>Vault items:</strong> Open the app → Vault tab → swipe to delete individual items, or unpair to clear all credentials</li>
-  <li><strong>Health data:</strong> The app reads from HealthKit but doesn't store copies. Revoke access in iOS Settings → Privacy → Health</li>
+  <li><strong>Vault items:</strong> Open ClawVault → Vault tab → swipe to delete individual items, or unpair to clear all credentials</li>
+  <li><strong>Health data:</strong> ClawVault reads from HealthKit but doesn't store copies. Revoke access in iOS Settings → Privacy → Health</li>
   <li><strong>Relay data:</strong> There is none. The relay stores nothing to disk. Restarting the relay clears all in-memory data.</li>
 </ul>
 
@@ -90,6 +91,7 @@
       <a href="/privacy.html">Privacy Policy</a>
       <a href="/terms.html">Terms of Service</a>
       <a href="/support.html">Support</a>
+      <a href="/security.html">Security</a>
       <a href="https://github.com/arunrlverma/relay4agents" target="_blank">GitHub</a>
     </div>
   </div>

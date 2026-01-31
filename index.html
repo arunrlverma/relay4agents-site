@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>relay4agents — Secure bridge between AI agents and your phone</title>
-  <meta name="description" content="Give your AI agent access to health data, identity, and payments — with biometric approval for every request. Your data never leaves your phone without Face ID.">
+  <title>ClawVault — Secure bridge between AI agents and your iPhone</title>
+  <meta name="description" content="ClawVault gives your AI agent access to health data, identity, and payments — with biometric approval for every request. Your data never leaves your phone without Face ID.">
   <meta name="theme-color" content="#0a0a0f">
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
@@ -22,6 +22,7 @@
       <a href="#how-it-works">How It Works</a>
       <a href="#features">Features</a>
       <a href="#vault">Vault</a>
+      <a href="/security.html">Security</a>
       <a href="https://github.com/arunrlverma/relay4agents" target="_blank">GitHub</a>
       <a href="#download" class="nav-cta">Download</a>
     </div>
@@ -32,7 +33,7 @@
 <section class="hero">
   <div class="container">
     <h1>Your phone. <span>Your agent.</span><br>Zero trust required.</h1>
-    <p>relay4agents bridges AI agents and your iPhone — health data, identity, payments — with biometric approval for every single request.</p>
+    <p>ClawVault bridges AI agents and your iPhone — health data, identity, payments — with biometric approval for every single request. Powered by the open-source relay4agents infrastructure.</p>
     <div class="hero-buttons">
       <a href="#download" class="btn btn-primary">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
@@ -105,6 +106,38 @@
   </div>
 </section>
 
+<!-- ── Pairing ──────────────────────────────────────────── -->
+<section id="pairing">
+  <div class="container section-center">
+    <p class="section-label">Get Started</p>
+    <h2 class="section-title">Pair in seconds. Just say the code.</h2>
+    <p class="section-desc">No QR codes, no manual config, no JSON blobs. ClawVault uses conversational pairing — tell your AI agent the code, and you're connected.</p>
+
+    <div class="pairing-steps">
+      <div class="pairing-step">
+        <div class="pairing-step-number">1</div>
+        <h4>Install ClawVault</h4>
+        <p>Download the app from the App Store. Open it up.</p>
+      </div>
+      <div class="pairing-step">
+        <div class="pairing-step-number">2</div>
+        <h4>Get Your Code</h4>
+        <p>The app shows a pairing code:<br><span class="pairing-code">CLAW-XXXX</span></p>
+      </div>
+      <div class="pairing-step">
+        <div class="pairing-step-number">3</div>
+        <h4>Tell Your Agent</h4>
+        <p>Say the code to your AI agent in natural language. That's it.</p>
+      </div>
+      <div class="pairing-step">
+        <div class="pairing-step-number">4</div>
+        <h4>Instant Pairing</h4>
+        <p>Agent claims the code. Secure channel established. You're live.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ── Features ─────────────────────────────────────────── -->
 <section id="features">
   <div class="container">
@@ -152,7 +185,7 @@
   <div class="container section-center">
     <p class="section-label">Secure Vault</p>
     <h2 class="section-title">Your agent can fill forms. You hold the keys.</h2>
-    <p class="section-desc">Tax forms, checkouts, signups — your agent handles them. Sensitive data comes from your phone, approved by your face, and expires in 60 seconds.</p>
+    <p class="section-desc">Tax forms, checkouts, signups — your agent handles them. Sensitive data comes from ClawVault on your phone, approved by your face, and expires in 60 seconds.</p>
 
     <div class="vault-features">
       <div class="vault-item">
@@ -195,6 +228,10 @@
         <p class="section-label">For Developers</p>
         <h2 class="section-title">Three API calls. That's it.</h2>
         <p class="section-desc">Push a request, pull the response. Standard HTTP. No SDK required. Works from bash, Python, Node, or any language with HTTP support.</p>
+        <div class="clawdhub-note">
+          <p>📦 Install the agent skill via ClawdHub: <code>clawdhub install clawvault</code></p>
+        </div>
+        <br>
         <a href="https://github.com/arunrlverma/relay4agents" class="btn btn-secondary" target="_blank">Read the Docs →</a>
       </div>
       <div class="code-block">
@@ -222,7 +259,7 @@
 <section class="cta-section" id="download">
   <div class="container">
     <h2>Free. Open source. <span style="color: var(--accent);">Yours.</span></h2>
-    <p>Download the app, self-host the relay, and give your agent<br>access to the real world — on your terms.</p>
+    <p>Download ClawVault, self-host the relay, and give your agent<br>access to the real world — on your terms.</p>
     <div class="hero-buttons">
       <a href="#" class="btn btn-primary" id="appstore-btn">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
@@ -244,6 +281,7 @@
       <a href="/privacy.html">Privacy Policy</a>
       <a href="/terms.html">Terms of Service</a>
       <a href="/support.html">Support</a>
+      <a href="/security.html">Security</a>
       <a href="https://github.com/arunrlverma/relay4agents" target="_blank">GitHub</a>
     </div>
   </div>
