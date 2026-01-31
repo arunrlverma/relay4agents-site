@@ -113,6 +113,35 @@
   <li>Any unsigned request — period</li>
 </ul>
 
+<!-- ── Token Security ──────────────────────────────────── -->
+<h2>Token Security</h2>
+<p>Authentication tokens are protected at every layer:</p>
+<ul>
+  <li><strong>SHA-256 hashed storage</strong> — auth tokens are never stored in plaintext on the relay. Only the hash is kept in memory for comparison.</li>
+  <li><strong>Timing-safe comparison</strong> — all token and signature checks use constant-time comparison to prevent timing side-channel attacks.</li>
+  <li><strong>Per-token rate limiting</strong> — dual-layer rate limiting by both IP address and token hash prevents abuse even from distributed sources.</li>
+</ul>
+
+<!-- ── Certificate Pinning ─────────────────────────────── -->
+<h2>Certificate Pinning</h2>
+<p>The ClawVault iOS app implements <strong>SSL certificate pinning</strong> to prevent man-in-the-middle attacks:</p>
+<ul>
+  <li>Pins to the <strong>ISRG Root X1</strong> (Let's Encrypt) public key hash</li>
+  <li>Connections to unauthorized hosts are rejected at the TLS layer</li>
+  <li>Protects against compromised CAs, rogue WiFi, and corporate proxies</li>
+  <li>Localhost connections are allowed for development only</li>
+</ul>
+
+<!-- ── Push Notification Security ──────────────────────── -->
+<h2>Push Notification Security</h2>
+<p>Vault requests delivered via APNs are validated before being acted on:</p>
+<ul>
+  <li><strong>Payload validation</strong> — request type, reason, and request ID are all validated against strict allowlists and format rules</li>
+  <li><strong>Invalid payloads are silently rejected</strong> — malformed push notifications cannot trigger the vault approval sheet</li>
+  <li><strong>APNs JWT rotation</strong> — authentication tokens for Apple Push Notification service are rotated every 15 minutes</li>
+  <li><strong>Terra webhook signatures</strong> — all incoming health data webhooks are verified against an HMAC signature before processing</li>
+</ul>
+
 <!-- ── Biometric Gates ─────────────────────────────────── -->
 <h2>Biometric Gates</h2>
 <p>All vault access in ClawVault requires <strong>Face ID or Touch ID</strong>. This is non-negotiable:</p>
@@ -127,7 +156,7 @@
 <h2>Keychain Protection</h2>
 <p>Vault items (credit cards, SSN, bank accounts, identity) are stored in the <strong>iOS Keychain</strong> with the strongest available protection:</p>
 <ul>
-  <li>Access class: <code>kSecAttrAccessibleWhenUnlockedThisDeviceOnly</code></li>
+  <li>Access class: <code>kSecAttrAccessibleWhenUnlockedThisDeviceOnly</code> — the strongest non-biometric protection class</li>
   <li><strong>Not synced</strong> to iCloud Keychain — data stays on your physical device</li>
   <li><strong>Not included</strong> in device backups (iTunes or iCloud)</li>
   <li>Protected by the Secure Enclave on devices that support it</li>

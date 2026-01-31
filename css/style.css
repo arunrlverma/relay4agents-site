@@ -542,6 +542,33 @@ footer .container {
   margin: 0;
 }
 
+/* ── Wearables ───────────────────────────────────────────── */
+
+.wearables-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 2rem;
+}
+
+.wearable-badge {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+  transition: all 0.2s ease;
+}
+
+.wearable-badge:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent);
+  color: #fff;
+}
+
 /* ── Responsive ──────────────────────────────────────────── */
 
 @media (max-width: 768px) {
