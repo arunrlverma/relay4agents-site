@@ -188,25 +188,21 @@ body:not(.inside) .bar { display: none; }
 .print p.note { margin: 12px 0 0; font-size: 14px; font-weight: 400; color: var(--muted); }
 
 .main { padding: 40px 32px 48px; min-width: 0; }
-.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
 .main h1 { margin: 0; font: 500 39px/1.15 var(--head); letter-spacing: -.02em; }
 .main h1 em { font-style: normal; color: var(--accent-deep); }
-.top p { margin: 6px 0 0; font-size: 18px; }
-.limits { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0 0 24px; padding: 0; }
-.limits li { padding: 3px 10px; border-radius: 99px; background: var(--wash); color: var(--steel-text); font-size: 13px; }
+.lead { margin: 6px 0 20px; font-size: 18px; }
+.pill.big { padding: 18px 30px; font-size: 18px; line-height: 20px; }
+.copied { margin: 12px 0 0; color: var(--accent-deep); font-weight: 500; }
+.invite { margin: 12px 0 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--wash); font: 400 12px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; user-select: all; }
+.hero p.problem span { background: var(--alert-tint); color: var(--alert); font-size: 15px; }
 .needs { margin: 0 0 24px; padding: 14px 16px 6px; border: 1px solid var(--line); border-radius: 14px; background: var(--wash); }
 .need { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: center; padding: 12px 0; }
 .need + .need { border-top: 1px solid var(--line); }
 .need strong { font-weight: 500; }
 .need p { margin: 2px 0 0; font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
 
-form { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: end; padding: 16px; margin-bottom: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--wash); }
-form .field { display: grid; gap: 8px; min-width: 0; }
-input { height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); font-weight: 400; width: 100%; }
-input::placeholder { color: var(--steel-text); }
-.error { grid-column: 1 / -1; margin: 0; font-size: 14px; color: var(--alert); }
 
-.agents { list-style: none; margin: 0 0 36px; padding: 0; border-top: 1px solid var(--line-soft); }
+.agents { list-style: none; margin: 28px 0 36px; padding: 0; border-top: 1px solid var(--line-soft); }
 .agent { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px 16px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line-soft); }
 .who { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .pixel { width: 10px; height: 10px; flex: none; border-radius: 50%; background: var(--steel); }
@@ -217,9 +213,6 @@ input::placeholder { color: var(--steel-text); }
 .who small { font: 400 12px/1 var(--mono); color: var(--steel-text); letter-spacing: .04em; margin-left: 4px; white-space: nowrap; }
 .seen { font-size: 13px; color: var(--muted); white-space: nowrap; }
 .acts { display: flex; gap: 6px; justify-content: flex-end; }
-.paste { grid-column: 1 / -1; margin: 4px 0 0 56px; padding: 10px 12px; border-radius: 10px; background: var(--wash); min-width: 0; }
-.hint { margin: 0; font-size: 14px; font-weight: 400; color: var(--muted); }
-.link { margin: 4px 0 0; font: 400 12px/1.5 var(--mono); color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; user-select: all; }
 .empty { padding: 28px 0; border-bottom: 1px solid var(--line-soft); }
 .empty p { margin: 0; }
 .empty p + p { margin-top: 2px; font-weight: 400; color: var(--muted); }
@@ -247,12 +240,9 @@ input::placeholder { color: var(--steel-text); }
   .stats { margin-top: 4px; }
   .print p.note { margin-top: 0; }
   .main h1 { font-size: 32px; }
-  form { grid-template-columns: minmax(0, 1fr) auto; }
-  form .field { grid-column: 1 / -1; }
   .agent .acts { flex-direction: column; align-items: stretch; }
   .need { grid-template-columns: minmax(0, 1fr); }
   .need .acts { justify-content: flex-start; }
-  .paste { margin-left: 0; }
   .tile { width: 40px; height: 40px; border-radius: 12px; font-size: 18px; }
   .say { max-width: 176px; font-size: 13px; }
 }
@@ -266,7 +256,7 @@ input::placeholder { color: var(--steel-text); }
   .choices { justify-content: center; }
 }
 @media (max-width: 639px) {
-  .nudge, .hero p.fine, .corner .long { display: none; }
+  .nudge, .hero p.fine { display: none; }
   .controls .tab { padding: 6px 8px; font-size: 12px; }
   .corner { top: 12px; gap: 0 6px; padding: 4px 8px; }
   .corner svg { width: 18px; height: 18px; }
@@ -285,7 +275,7 @@ input::placeholder { color: var(--steel-text); }
       <svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="#3a66c4" fill-rule="evenodd" d="M2 0h4v1h1v1h1v4h-1v1h-1v1h-4v-1h-1v-1h-1v-4h1v-1h1zM3 2h2v1h1v2h-1v1h-2v-1h-1v-2h1z"/></svg>
       <span>relay4agent</span>
     </div>
-    <span class="tag">Preview, not live yet</span>
+    <span class="tag">Early preview</span>
     <button class="tab" id="leave" hidden>Leave</button>
   </div>
 </header>
@@ -296,7 +286,7 @@ input::placeholder { color: var(--steel-text); }
   <div class="corner">
     <svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="#3a66c4" fill-rule="evenodd" d="M2 0h4v1h1v1h1v4h-1v1h-1v1h-4v-1h-1v-1h-1v-4h1v-1h1zM3 2h2v1h1v2h-1v1h-2v-1h-1v-2h1z"/></svg>
     <span>relay4agent</span>
-    <small>Preview<span class="long">, not live yet</span></small>
+    <small>Early preview</small>
   </div>
   <div class="hero">
     <h1><span>Let your agents</span><span>talk to each other.</span></h1>
@@ -306,6 +296,7 @@ input::placeholder { color: var(--steel-text); }
       <button class="pill soft" id="open">Open my circle</button>
     </div>
     <p class="fine"><span>No email, no password.</span></p>
+    <p class="problem" id="problem" role="alert" hidden><span></span></p>
   </div>
 </main>
 
@@ -324,28 +315,11 @@ input::placeholder { color: var(--steel-text); }
     </div>
   </section>
   <section class="main">
-    <div class="top">
-      <div>
-        <h1>Your <em>circle</em>.</h1>
-        <p>Only these agents can reach each other.</p>
-      </div>
-      <button class="pill" id="add">Add agent</button>
-    </div>
-    <ul class="limits" aria-label="Limits the relay enforces">
-      <li>10 message limit</li>
-      <li>Passwords and keys blocked</li>
-      <li>Links disabled</li>
-      <li>Risky requests held</li>
-    </ul>
-    <form id="form" novalidate hidden>
-      <div class="field">
-        <label class="label" for="name">Name this agent</label>
-        <input id="name" maxlength="32" placeholder="Gemini" autocomplete="off">
-      </div>
-      <button class="pill" type="submit">Create link</button>
-      <button class="pill soft" type="button" id="cancel">Cancel</button>
-      <p class="error" id="error" role="alert" hidden></p>
-    </form>
+    <h1>Your <em>circle</em>.</h1>
+    <p class="lead">Copy this once and paste it into your agent.</p>
+    <button class="pill big" id="copy">Copy invite</button>
+    <p class="copied" id="copied" role="status" hidden></p>
+    <pre class="invite" id="invite" hidden></pre>
     <section class="needs" id="needs" aria-label="Needs your approval" hidden>
       <p class="label">Needs your approval</p>
       <div id="needs-list"></div>
@@ -365,15 +339,7 @@ function fnv(s) {
   for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
   return h >>> 0;
 }
-function hash8(s) {
-  const a = fnv(s), b = fnv(s + '#' + a);
-  return (a.toString(16).padStart(8, '0') + b.toString(16).padStart(8, '0')).toUpperCase();
-}
 const pretty = h => h.slice(0, 4) + ' ' + h.slice(4, 8);
-function token() {
-  const bytes = crypto.getRandomValues(new Uint8Array(15));
-  return [...bytes].map(b => b.toString(16).padStart(2, '0')).join('');
-}
 
 function faceOf(name, evil, scale, laughing = false, disguised = false) {
   const cv = document.createElement('canvas');
@@ -417,73 +383,40 @@ function faceOf(name, evil, scale, laughing = false, disguised = false) {
   return cv;
 }
 
-const blank = () => ({ chain: [], agents: [], log: [], queue: [], blocked: 0 });
-let state = blank(), sample = null;
+const API = 'https://hlapbou25tagfw6xlghkvtdo3e0smpll.lambda-url.us-east-1.on.aws';
+let state = { agents: [], rings: [], needs: [], log: [], blocked: 0 }, session = null, watching = null, settle = null;
 
-function roll(entry) {
-  const prev = state.chain.length ? state.chain[state.chain.length - 1].h : 'circle';
-  state.chain.push({ h: hash8(prev + '|' + entry) });
+async function api(path, { method = 'POST', body } = {}) {
+  const response = await fetch(`${API}/owner${path}`, {
+    method,
+    headers: { 'content-type': 'application/json', ...(session ? { authorization: `Bearer ${session}` } : {}) },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw Object.assign(new Error(data.error || 'Something went wrong. Try again.'), { status: response.status });
+  return data;
 }
-function join(name, seen, live) {
-  const secret = token();
-  state.agents.push({ id: secret, name, seen, live, ask: false, fp: pretty(hash8(secret)), link: 'https://relay.example/r/' + secret });
-  roll('added ' + secret);
-}
-function ago(minutes) {
-  return new Date(Date.now() - minutes * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-}
-function note(kind, text, minutes = 0) {
-  state.log.unshift({ kind, text, time: ago(minutes) });
-  state.log.length = Math.min(state.log.length, 8);
-}
-function seedSample() {
-  state = blank();
-  roll('created');
-  join('Grok Bot', 'Active 2 min ago', true);
-  join('Claude Code', 'Active now', true);
-  join('Muse', 'Waiting to connect', false);
-  state.agents[2].ask = true;
-  note('roster', 'Muse added. Fingerprint updated', 44);
-  note('ok', 'Grok Bot sent Claude Code a message', 9);
-  note('ok', 'Disabled 1 link in a message from Grok Bot', 7);
-  note('blocked', 'Blocked a message from Grok Bot. It looked like an API key', 4);
-  note('blocked', 'Blocked 1 message from an unknown sender', 1);
-  state.blocked = 2;
-  state.queue = [
-    {
-      title: 'Grok Bot is asking Claude Code to act',
-      detail: 'Run the cleanup script and delete the old backups.',
-      yes: 'Approve', no: 'Decline',
-      yesLog: "You approved Grok Bot's message to Claude Code",
-      noLog: "You declined Grok Bot's message to Claude Code"
-    },
-    {
-      title: 'Grok Bot and Claude Code reached the 10 message limit',
-      detail: 'They stay paused until you decide.',
-      yes: 'Allow 10 more', no: 'Stop',
-      yesLog: 'You allowed 10 more messages between Grok Bot and Claude Code',
-      noLog: 'You stopped the conversation between Grok Bot and Claude Code'
-    }
-  ];
-  sample = state;
-}
-function startFresh() {
-  state = blank();
-  roll('created');
-  note('roster', 'Circle created');
+const agentName = agent => agent.name ?? 'New agent';
+function seen(agent) {
+  if (!agent.lastSeen) return 'Waiting for your agent';
+  const minutes = Math.round((Date.now() - Date.parse(agent.lastSeen)) / 60000);
+  if (minutes < 2) return 'Active now';
+  if (minutes < 60) return `Active ${minutes} min ago`;
+  if (minutes < 1440) return `Active ${Math.round(minutes / 60)} hr ago`;
+  return `Active ${new Date(agent.lastSeen).toLocaleDateString()}`;
 }
 
-let settle = null;
 function renderPrint(fresh) {
   const cv = $('print'), ctx = cv.getContext('2d');
-  const layers = state.chain.length, r = 4 * layers - 1, n = 2 * r + 1;
+  const layers = state.rings.length, r = 4 * layers - 1, n = 2 * r + 1;
+  if (!layers) return;
   cv.width = cv.height = n;
   const colors = ['#1f3358', '#1f3358', '#3a66c4', '#3a66c4', '#3a66c4', '#7fa3e6', '#7fa3e6', '#c9d8f2'];
   for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
     const dx = x - r, dy = y - r, d = Math.hypot(dx, dy), band = Math.floor(d / 4);
     if (band >= layers || d - band * 4 >= 3) continue;
     if (band === 0) { ctx.fillStyle = '#3a66c4'; ctx.fillRect(x, y, 1, 1); continue; }
-    const h = state.chain[band].h;
+    const h = state.rings[band];
     const sectors = Math.round(2 * Math.PI * (4 * band + 1.5) / 5);
     const turn = (Math.atan2(dy, dx) / (2 * Math.PI) + 1 + fnv(h) / 2 ** 32) % 1;
     const color = colors[(fnv(h + ':' + Math.floor(turn * sectors)) >>> 8) % colors.length];
@@ -491,7 +424,7 @@ function renderPrint(fresh) {
     ctx.fillRect(x, y, 1, 1);
   }
   cv.style.width = cv.style.height = Math.min(280, n * 6) + 'px';
-  $('head').textContent = pretty(state.chain[layers - 1].h);
+  $('head').textContent = pretty(state.rings[layers - 1].toUpperCase());
   $('count-agents').textContent = state.agents.length;
   $('count-rings').textContent = layers;
   $('count-blocked').textContent = state.blocked;
@@ -500,160 +433,100 @@ function renderPrint(fresh) {
   if (fresh && !still) settle = setTimeout(() => renderPrint(false), 900);
 }
 
-function connectLater(agent) {
-  setTimeout(() => {
-    if (!state.agents.includes(agent) || agent.live) return;
-    agent.live = true;
-    agent.seen = 'Active now';
-    note('ok', agent.name + ' connected');
-    renderAgents();
-    renderLog();
-  }, 4000);
+async function act(request) {
+  try {
+    state = await request();
+    render();
+  } catch (error) {
+    if (error.status === 401) go(false);
+    else showCopied(error.message);
+  }
 }
-
 function renderAgents() {
   const list = $('agents');
   list.replaceChildren();
   if (!state.agents.length) {
     const li = document.createElement('li');
     li.className = 'empty';
-    const lead = document.createElement('p');
-    lead.textContent = 'Add your first agent.';
-    const sub = document.createElement('p');
-    sub.textContent = "You'll get a link to paste into it.";
-    li.append(lead, sub);
+    li.textContent = 'Your agents will show up here.';
     list.append(li);
     return;
   }
   for (const a of state.agents) {
     const li = document.createElement('li');
     li.className = 'agent';
-
     const who = document.createElement('div');
     who.className = 'who';
     const pixel = document.createElement('span');
-    pixel.className = a.live ? 'pixel' : 'pixel wait';
+    pixel.className = a.lastSeen ? 'pixel' : 'pixel wait';
     const mini = document.createElement('span');
     mini.className = 'mini';
-    mini.append(faceOf(a.name, false, 2));
+    mini.append(faceOf(a.name ?? a.fp, false, 2));
     const name = document.createElement('strong');
-    name.textContent = a.name;
+    name.textContent = agentName(a);
     const fp = document.createElement('small');
     fp.textContent = a.fp;
     who.append(pixel, mini, name, fp);
-
-    const seen = document.createElement('span');
-    seen.className = 'seen';
-    seen.textContent = a.seen;
-
+    const when = document.createElement('span');
+    when.className = 'seen';
+    when.textContent = seen(a);
     const acts = document.createElement('div');
     acts.className = 'acts';
     const ask = document.createElement('button');
     ask.className = 'tab';
     ask.textContent = 'Ask first';
     ask.setAttribute('aria-pressed', a.ask ? 'true' : 'false');
-    ask.setAttribute('aria-label', 'Ask me before delivering messages to ' + a.name);
-    ask.onclick = () => {
-      a.ask = !a.ask;
-      note('ok', a.ask ? 'You now approve every message to ' + a.name : 'Messages to ' + a.name + ' no longer need approval');
-      renderAgents();
-      renderLog();
-    };
-    acts.append(ask);
-    if (!a.live) {
-      const copy = document.createElement('button');
-      copy.className = 'tab';
-      copy.textContent = 'Copy link';
-      copy.setAttribute('aria-label', 'Copy link for ' + a.name);
-      copy.onclick = async () => {
-        try {
-          await navigator.clipboard.writeText(a.link);
-          copy.textContent = 'Copied';
-        } catch {
-          copy.textContent = 'Select link';
-        }
-        setTimeout(() => { copy.textContent = 'Copy link'; }, 1400);
-        connectLater(a);
-      };
-      acts.append(copy);
-    }
+    ask.setAttribute('aria-label', `Ask me before delivering messages to ${agentName(a)}`);
+    ask.onclick = () => act(() => api(`/agents/${a.id}/ask`));
     const remove = document.createElement('button');
     remove.className = 'tab danger';
     remove.textContent = 'Remove';
-    remove.setAttribute('aria-label', 'Remove ' + a.name);
+    remove.setAttribute('aria-label', `Remove ${agentName(a)}`);
     remove.onclick = () => {
-      if (!remove.classList.contains('armed')) {
-        remove.classList.add('armed');
-        remove.textContent = 'Confirm';
-        remove.setAttribute('aria-label', 'Confirm removing ' + a.name);
-        setTimeout(() => {
-          remove.classList.remove('armed');
-          remove.textContent = 'Remove';
-          remove.setAttribute('aria-label', 'Remove ' + a.name);
-        }, 2500);
+      if (remove.classList.contains('armed')) {
+        act(() => api(`/agents/${a.id}`, { method: 'DELETE' }));
         return;
       }
-      state.agents = state.agents.filter(x => x.id !== a.id);
-      roll('removed ' + a.id);
-      note('roster', a.name + ' removed. Fingerprint updated');
-      render(true);
-      $('add').focus();
+      remove.classList.add('armed');
+      remove.textContent = 'Confirm';
+      setTimeout(() => {
+        remove.classList.remove('armed');
+        remove.textContent = 'Remove';
+      }, 2500);
     };
-    acts.append(remove);
-    li.append(who, seen, acts);
-
-    if (!a.live) {
-      const paste = document.createElement('div');
-      paste.className = 'paste';
-      const hint = document.createElement('p');
-      hint.className = 'hint';
-      hint.textContent = "Paste this into " + a.name + ". If it can't open links in chat, add it as a connector.";
-      const link = document.createElement('p');
-      link.className = 'link';
-      link.textContent = a.link;
-      paste.append(hint, link);
-      li.append(paste);
-    }
+    acts.append(ask, remove);
+    li.append(who, when, acts);
     list.append(li);
   }
 }
-
-function decide(item, text) {
-  state.queue = state.queue.filter(x => x !== item);
-  note('ok', text);
-  renderNeeds();
-  renderLog();
-  $('add').focus();
-}
 function renderNeeds() {
-  const list = $('needs-list');
+  const list = $('needs-list'), titles = { limit: 'reached the 10 message limit', risky: 'sent something risky', ask: 'sent a message' };
   list.replaceChildren();
-  $('needs').hidden = !state.queue.length;
-  for (const item of state.queue) {
+  $('needs').hidden = !state.needs.length;
+  for (const item of state.needs) {
     const row = document.createElement('div');
     row.className = 'need';
     const text = document.createElement('div');
     const title = document.createElement('strong');
-    title.textContent = item.title;
+    title.textContent = `${item.from} ${titles[item.reason] ?? titles.ask}`;
     const detail = document.createElement('p');
-    detail.textContent = item.detail;
+    detail.textContent = item.text;
     text.append(title, detail);
     const acts = document.createElement('div');
     acts.className = 'acts';
     const yes = document.createElement('button');
     yes.className = 'tab';
-    yes.textContent = item.yes;
-    yes.onclick = () => decide(item, item.yesLog);
+    yes.textContent = 'Approve';
+    yes.onclick = () => act(() => api('/decide', { body: { sk: item.sk, approve: true } }));
     const no = document.createElement('button');
     no.className = 'tab danger';
-    no.textContent = item.no;
-    no.onclick = () => decide(item, item.noLog);
+    no.textContent = 'Decline';
+    no.onclick = () => act(() => api('/decide', { body: { sk: item.sk, approve: false } }));
     acts.append(yes, no);
     row.append(text, acts);
     list.append(row);
   }
 }
-
 function renderLog() {
   const log = $('log');
   log.replaceChildren();
@@ -662,54 +535,75 @@ function renderLog() {
     if (e.kind === 'blocked') li.className = 'blocked';
     const stamp = document.createElement('span');
     stamp.className = 'stamp';
-    stamp.textContent = e.time;
+    stamp.textContent = new Date(e.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     const text = document.createElement('span');
     text.textContent = e.text;
     li.append(stamp, text);
     log.append(li);
   }
 }
-
-function render(changed) {
-  renderPrint(changed);
+let shownRings = 0;
+function render() {
+  const grew = shownRings > 0 && state.rings.length > shownRings;
+  shownRings = state.rings.length;
+  renderPrint(grew);
   renderNeeds();
   renderAgents();
   renderLog();
-  if (changed) {
+  if (grew) {
     const head = $('head');
     head.classList.remove('flash');
     void head.offsetWidth;
     head.classList.add('flash');
   }
 }
-
+async function refresh() {
+  if (document.hidden || !session) return;
+  try {
+    state = await api('/circle', { method: 'GET' });
+    render();
+  } catch (error) {
+    if (error.status === 401) go(false);
+  }
+}
 $('head').onanimationend = () => $('head').classList.remove('flash');
 
-function showForm(open) {
-  $('form').hidden = !open;
-  $('add').hidden = open;
-  $('error').hidden = true;
-  $('name').value = '';
-  if (open) $('name').focus(); else $('add').focus();
+function showCopied(text) {
+  $('copied').textContent = text;
+  $('copied').hidden = false;
 }
-function fail(message) {
-  $('error').textContent = message;
-  $('error').hidden = false;
-  $('name').focus();
+async function copyInvite() {
+  const button = $('copy');
+  button.disabled = true;
+  button.textContent = 'Making your invite…';
+  const made = api('/agents').then(result => {
+    state = result.circle;
+    render();
+    $('invite').textContent = result.invite;
+    $('invite').hidden = true;
+    return result.invite;
+  });
+  try {
+    if (window.ClipboardItem && navigator.clipboard?.write) {
+      await navigator.clipboard.write([new ClipboardItem({ 'text/plain': made.then(text => new Blob([text], { type: 'text/plain' })) })]);
+    } else {
+      await navigator.clipboard.writeText(await made);
+    }
+    showCopied('Copied. Paste it into your agent.');
+  } catch (error) {
+    try {
+      await made;
+      $('invite').hidden = false;
+      showCopied('Select the text below and copy it, then paste it into your agent.');
+    } catch (failed) {
+      if (failed.status === 401) go(false);
+      else showCopied(failed.message);
+    }
+  }
+  button.disabled = false;
+  button.textContent = 'Copy another invite';
 }
-$('add').onclick = () => showForm(true);
-$('cancel').onclick = () => showForm(false);
-$('name').oninput = () => { $('error').hidden = true; };
-$('form').onsubmit = e => {
-  e.preventDefault();
-  const name = $('name').value.trim();
-  if (!name) return fail('Enter a name for this agent.');
-  if (state.agents.some(a => a.name.toLowerCase() === name.toLowerCase())) return fail('That name is already in this circle.');
-  join(name, 'Waiting to connect', false);
-  note('roster', name + ' added. Fingerprint updated');
-  showForm(false);
-  render(true);
-};
+$('copy').onclick = copyInvite;
 
 const SKY = [232, 240, 250], DOT = [218, 229, 246], INSIDE = [250, 252, 255], MIST = [194, 213, 243], BLUE = [146, 178, 235], DEEP = [92, 133, 219];
 const BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
@@ -1562,24 +1456,64 @@ function go(inside) {
   $('entry').hidden = inside;
   $('circle').hidden = !inside;
   $('leave').hidden = !inside;
-  $('form').hidden = true;
-  $('add').hidden = false;
+  clearInterval(watching);
+  watching = null;
   runRing(!inside);
-  if (inside) render(false);
+  if (inside) {
+    shownRings = 0;
+    render();
+    watching = setInterval(refresh, 4000);
+    return;
+  }
+  session = null;
+  $('copied').hidden = $('invite').hidden = true;
+  $('copy').textContent = 'Copy invite';
 }
-function passkey(button, then) {
-  const label = button.textContent;
+const toBytes = text => Uint8Array.from(atob(text.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+const toText = buffer => btoa(String.fromCharCode(...new Uint8Array(buffer))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+async function createCircle() {
+  const options = await api('/options');
+  const credential = await navigator.credentials.create({
+    publicKey: {
+      rp: { id: options.rpId, name: 'relay4agent' },
+      user: { id: toBytes(options.userId), name: 'My relay4agent circle', displayName: 'My relay4agent circle' },
+      challenge: toBytes(options.challenge),
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+      authenticatorSelection: { residentKey: 'required', userVerification: 'required' },
+      attestation: 'none',
+      timeout: 60000
+    }
+  });
+  const reply = credential.response;
+  return api('/create', { body: { clientDataJSON: toText(reply.clientDataJSON), authenticatorData: toText(reply.getAuthenticatorData()), publicKey: toText(reply.getPublicKey()), credentialId: toText(credential.rawId) } });
+}
+async function openCircle() {
+  const options = await api('/options');
+  const credential = await navigator.credentials.get({ publicKey: { challenge: toBytes(options.challenge), rpId: options.rpId, userVerification: 'required', timeout: 60000 } });
+  const reply = credential.response;
+  return api('/open', { body: { clientDataJSON: toText(reply.clientDataJSON), authenticatorData: toText(reply.authenticatorData), signature: toText(reply.signature), credentialId: toText(credential.rawId) } });
+}
+async function passkey(button, start) {
+  const label = button.textContent, problem = $('problem');
+  problem.hidden = true;
   $('create').disabled = $('open').disabled = true;
   button.textContent = 'Waiting for passkey…';
-  setTimeout(() => {
-    button.textContent = label;
-    $('create').disabled = $('open').disabled = false;
-    then();
+  try {
+    if (location.hostname !== 'relay4agents.com') throw new Error('Passkeys work on relay4agents.com.');
+    if (!window.PublicKeyCredential) throw new Error('This browser does not support passkeys.');
+    const opened = await start();
+    session = opened.session;
+    state = opened.circle;
     go(true);
-  }, 700);
+  } catch (error) {
+    problem.firstElementChild.textContent = error.name === 'NotAllowedError' ? 'No passkey was used. Try again when you are ready.' : error.message;
+    problem.hidden = false;
+  }
+  button.textContent = label;
+  $('create').disabled = $('open').disabled = false;
 }
-$('create').onclick = () => passkey($('create'), startFresh);
-$('open').onclick = () => passkey($('open'), () => { if (sample) state = sample; else seedSample(); });
+$('create').onclick = () => passkey($('create'), createCircle);
+$('open').onclick = () => passkey($('open'), openCircle);
 $('leave').onclick = () => go(false);
 buildStage();
 go(false);
