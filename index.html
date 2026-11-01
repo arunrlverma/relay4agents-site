@@ -788,8 +788,8 @@ function buildStage() {
   score.setAttribute('aria-live', 'polite');
   stage.append(packet, tag, controls, score);
   HOMES.forEach(home => addInvader(home));
-  invaders[0].el.classList.add('hinted');
-  invaders[0].jab.textContent = 'Drag me back, let go';
+  invaders[2].el.classList.add('hinted');
+  invaders[2].jab.textContent = 'Drag me back, let go';
 }
 function addInvader(home) {
   const node = document.createElement('div');
@@ -962,10 +962,10 @@ function aimAt(e, x, y) {
 }
 function played() {
   lastPlay = performance.now();
-  const first = invaders[0];
-  if (!first.el.classList.contains('hinted')) return;
-  first.el.classList.remove('hinted', 'on');
-  first.jab.textContent = TAUNTS[0];
+  const guide = invaders[2];
+  if (!guide.el.classList.contains('hinted')) return;
+  guide.el.classList.remove('hinted', 'on');
+  guide.jab.textContent = TAUNTS[2];
 }
 function shoot(e, vx, vy) {
   e.vx = vx;
@@ -1160,7 +1160,7 @@ function runRing(on) {
   if (!on) return;
   paintRing();
   placeStage();
-  if (invaders[0].el.classList.contains('hinted')) invaders[0].el.classList.add('on');
+  if (invaders[2].el.classList.contains('hinted')) invaders[2].el.classList.add('on');
   talk(talkId);
   if (!still) prowl(talkId);
   if (!still) timer = setInterval(() => { phase += .012; paintRing(); }, 120);
