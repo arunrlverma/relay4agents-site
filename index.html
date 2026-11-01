@@ -1553,9 +1553,15 @@ async function passkey(button, start) {
   button.textContent = label;
   $('create').disabled = $('open').disabled = false;
 }
-$('create').onclick = () => passkey($('create'), createCircle);
+$('create').onclick = () => {
+  if (stored('relay4agent-account') && !confirm('You already have a circle on this device. If you make a new one, you won\'t be able to open the old one here. Make a new circle?')) return;
+  passkey($('create'), createCircle);
+};
 $('open').onclick = () => passkey($('open'), openCircle);
-$('leave').onclick = () => go(false);
+$('leave').onclick = () => {
+  if (session) idp('GlobalSignOut', { AccessToken: session }).catch(() => {});
+  go(false);
+};
 buildStage();
 go(false);
 </script>
