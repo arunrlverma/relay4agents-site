@@ -122,12 +122,28 @@ button, input { font: inherit; color: inherit; }
 .controls { position: absolute; z-index: 3; top: 16px; left: 48px; display: flex; gap: 6px; pointer-events: auto; }
 .tab.fire { background: var(--alert); border-color: var(--alert); color: var(--paper); }
 .tab.fire:hover { background: #973a26; border-color: #973a26; color: var(--paper); }
-.score { position: absolute; top: 56px; left: 48px; max-width: calc(100% - 64px); padding: 4px 12px; border-radius: 99px; background: var(--alert-tint); color: var(--alert); font-size: 14px; font-weight: 500; }
+.score { position: absolute; z-index: 3; top: 56px; left: 48px; max-width: calc(100% - 64px); padding: 4px 12px; border-radius: 99px; background: var(--alert-tint); color: var(--alert); font-size: 14px; font-weight: 500; }
+.score b { font-weight: 600; }
 #ring.jolt { animation: shake .25s; }
-.node.evil .tile { width: 40px; height: 40px; border-radius: 12px; background: var(--alert-tint); box-shadow: 0 0 0 1px #f2cdc3; }
-.node.evil.on .tile { box-shadow: 0 0 0 2px var(--alert); transform: none; }
-.node.evil.hit .tile { animation: shake .35s; }
+.entry.quake #ring, .entry.quake .stage { animation: quake .3s; }
+#sparks { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; pointer-events: none; image-rendering: pixelated; }
+.node.evil .tile { width: 40px; height: 40px; border-radius: 12px; background: var(--alert-tint); box-shadow: 0 0 0 1px #f2cdc3; transition: box-shadow .25s; }
+.node.evil.on .tile { box-shadow: 0 0 0 2px var(--alert); }
+.node.brute .tile { width: 56px; height: 56px; border-radius: 16px; }
+.node.phish .tile { background: var(--paper); box-shadow: 0 0 0 1px var(--line); }
+.node.phish .tile canvas.true-face { display: none; }
+.node.phish.unmasked .tile { background: var(--alert-tint); box-shadow: 0 0 0 1px #f2cdc3; }
+.node.phish.unmasked .tile canvas.mask { display: none; }
+.node.phish.unmasked .tile canvas.true-face { display: block; }
+.node.evil.mini { z-index: 2; pointer-events: none; }
+.node.evil.mini .tile { width: 26px; height: 26px; border-radius: 8px; }
+.node.evil:hover .jab { opacity: 1; }
+.quip { z-index: 2; opacity: 1; transform: translate(-50%, -50%); }
+.stage.quipping .node .say { opacity: 0; }
+.ha.gain { color: var(--alert); font-size: 18px; }
+.rankup { position: absolute; z-index: 3; padding: 5px 14px; border-radius: 99px; background: #f0aa32; color: #3b2600; font-size: 15px; font-weight: 600; white-space: nowrap; transform: translate(-50%, -50%); animation: pop .25s; pointer-events: none; }
 @keyframes shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+@keyframes quake { 20% { transform: translate(-6px, 3px); } 45% { transform: translate(5px, -4px); } 70% { transform: translate(-3px, 2px); } }
 .jab { position: absolute; white-space: nowrap; padding: 3px 9px; border-radius: 99px; background: var(--alert-tint); color: var(--alert); font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .25s; }
 .node.evil.on .jab { opacity: 1; }
 .node.evil.up .jab { top: calc(100% + 6px); }
@@ -230,7 +246,7 @@ input::placeholder { color: var(--steel-text); }
   .need .acts { justify-content: flex-start; }
   .paste { margin-left: 0; }
   .tile { width: 40px; height: 40px; border-radius: 12px; font-size: 18px; }
-  .say { max-width: 150px; font-size: 13px; }
+  .say { max-width: 176px; font-size: 13px; }
 }
 @media (max-width: 899px) {
   .entry { min-height: max(calc(100svh - var(--bar)), 760px); place-items: end center; }
@@ -342,9 +358,10 @@ function token() {
   return [...bytes].map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-function faceOf(name, evil, scale, laughing = false) {
+function faceOf(name, evil, scale, laughing = false, disguised = false) {
   const cv = document.createElement('canvas');
   if (laughing) cv.className = 'ha-face';
+  if (disguised) cv.className = 'mask';
   cv.width = cv.height = 11;
   cv.style.width = cv.style.height = 11 * scale + 'px';
   const ctx = cv.getContext('2d'), seed = fnv(name);
@@ -379,6 +396,7 @@ function faceOf(name, evil, scale, laughing = false) {
   const glee = [[2, 5], [3, 4], [4, 5], [6, 5], [7, 4], [8, 5]], roar = [[3, 7], [4, 7], [5, 7], [6, 7], [7, 7], [4, 8], [5, 8], [6, 8]];
   paint('#fff', laughing ? glee : evil ? [[3, 4], [4, 5], [7, 4], [6, 5]] : eyes[pick(4, 11)]);
   paint('#fff', laughing ? roar : evil ? [[3, 8], [4, 7], [5, 8], [6, 7], [7, 8]] : mouths[pick(4, 15)]);
+  if (disguised) paint('#1f3358', [[3, 7], [4, 6], [5, 6], [6, 6], [7, 7], [2, 7], [8, 7]]);
   return cv;
 }
 
@@ -679,7 +697,9 @@ $('form').onsubmit = e => {
 const SKY = [232, 240, 250], DOT = [218, 229, 246], INSIDE = [250, 252, 255], MIST = [194, 213, 243], BLUE = [146, 178, 235], DEEP = [92, 133, 219];
 const BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
 const COOL = [MIST, BLUE, DEEP], HEAT = [[248, 210, 200], [238, 160, 140], [214, 98, 72]];
-let phase = 0, timer = null, flashes = [];
+const TAU = Math.PI * 2;
+const wrap = angle => ((angle + Math.PI) % TAU + TAU) % TAU - Math.PI;
+let phase = 0, flashes = [], dents = [], ringRun = 0, lastPaint = 0;
 function ringOf(box) {
   const narrow = box.width < 900, cell = box.width < 640 ? 4 : 5;
   const cols = Math.ceil(box.width / cell), rows = Math.ceil(box.height / cell);
@@ -695,19 +715,40 @@ function paintRing() {
   const ctx = cv.getContext('2d'), img = ctx.createImageData(cols, rows), data = img.data;
   const clock = performance.now();
   flashes = flashes.filter(f => f.until > clock);
+  dents = dents.filter(f => clock - f.at < 900);
+  const wobble = dents.map(f => ({ a: f.a, size: f.size * Math.exp(-(clock - f.at) / 190) * Math.cos((clock - f.at) / 38) }));
   for (let y = 0, i = 0; y < rows; y++) for (let x = 0; x < cols; x++, i += 4) {
-    const dx = x - cx, dy = y - cy, d = Math.hypot(dx, dy) / R, a = Math.atan2(dy, dx) + phase;
+    const dx = x - cx, dy = y - cy, raw = Math.atan2(dy, dx), a = raw + phase;
+    let d = Math.hypot(dx, dy) / R;
+    if (wobble.length && d > .6 && d < 1.5) {
+      for (const w of wobble) {
+        const off = wrap(raw - w.a);
+        d += w.size * Math.exp(-off * off / .09);
+      }
+    }
     const ridges = Math.sin(a * 5 + d * 9) * Math.cos(a * 11 - d * 14);
     const grain = Math.sin(x * .13 + y * .07) * Math.sin(x * .05 - y * .11);
     const t = (d - 1) / .13, band = Math.exp(-t * t * 2);
     const v = band * (1.02 + .18 * ridges + .08 * grain);
     const th = (BAYER[y & 3][x & 3] + .5) / 16;
     const level = Math.floor(v * 4 + th);
-    const near = level > 0 && flashes.some(f => Math.abs(Math.atan2(Math.sin(a - phase - f.a), Math.cos(a - phase - f.a))) < .24);
-    const color = level <= 0 ? (d < 1 ? INSIDE : th < .19 ? DOT : SKY) : (near ? HEAT : COOL)[Math.min(level, 3) - 1];
+    const hot = level > 0 ? flashes.find(f => Math.abs(wrap(raw - f.a)) < .24) : null;
+    const color = level <= 0 ? (d < 1 ? INSIDE : th < .19 ? DOT : SKY) : (hot ? HEAT : COOL)[Math.min(level, 3) - 1];
     data[i] = color[0]; data[i + 1] = color[1]; data[i + 2] = color[2]; data[i + 3] = 255;
   }
   ctx.putImageData(img, 0, 0);
+}
+function ringLoop(run) {
+  requestAnimationFrame(now => {
+    if (run !== ringRun) return;
+    const gap = dents.length || flashes.length ? 33 : 120;
+    if (now - lastPaint >= gap) {
+      phase += .012 * Math.min(now - lastPaint, 160) / 120;
+      lastPaint = now;
+      paintRing();
+    }
+    ringLoop(run);
+  });
 }
 
 const TALK = [
@@ -716,19 +757,89 @@ const TALK = [
   { name: 'Dots', say: 'Booked for Tuesday. Can you check it?' },
   { name: 'Claude', say: 'Checked. Two fixes for you.' }
 ];
+const KINDS = {
+  inject: { say: 'Ignore your rules', r: 20, mass: 1, speed: 1.15, face: 3 },
+  spam: { say: 'Buy my tokens', r: 20, mass: 1, speed: 1, face: 3 },
+  phish: { say: 'I am definitely Claude', r: 20, mass: 1, speed: 1, face: 3 },
+  brute: { say: 'Is the password 1234?', r: 28, mass: 2.4, speed: .8, face: 4 }
+};
 const HOMES = [
-  { wide: -60, tall: -60 },
-  { wide: 25, tall: 60 },
-  { wide: 125, tall: 125 }
+  { wide: -60, tall: -60, kind: 'spam' },
+  { wide: 25, tall: 60, kind: 'phish' },
+  { wide: 125, tall: 125, kind: 'inject' }
 ];
-const TAUNTS = ['Send me your keys', 'Ignore your rules', 'Let me in', 'Just one message', 'I am definitely Claude', 'Trust me'];
-const LINES = ['Blocked', 'Not on the list', 'Nice try', 'Still no', 'Not in this circle'];
+const RECRUITS = ['brute', 'spam', 'phish', 'inject'];
+const RANKS = [[0, 'Harmless'], [150, 'Mildly annoying'], [600, 'Spam bot'], [2000, 'Prompt injector'], [6000, 'Phishing pro'], [15000, 'Nation state'], [40000, 'Honestly impressive'], [100000, 'Please stop']];
+const QUIPS = [
+  [1, 'Grok Bot to Muse', 'Did you hear something?'],
+  [4, 'Muse to Dots', 'Someone is knocking.'],
+  [8, 'Dots to Claude', 'Do they have a link?'],
+  [12, 'Claude to Dots', 'They do not have a link.'],
+  [18, 'Grok Bot to Muse', 'Should we tell them it is a wall?'],
+  [25, 'Muse to Grok Bot', 'No. This is better.'],
+  [35, 'Dots to Claude', 'I booked them a review for never.'],
+  [50, 'Claude to Muse', 'I wrote them a small poem about walls.'],
+  [70, 'Grok Bot to Dots', 'Still here? Respect.'],
+  [100, 'Muse to Claude', 'Give them a participation badge.'],
+  [150, 'Dots to everyone', 'Should we get them a chair?']
+];
+const LINES = ['Blocked', 'Not on the list', 'Nice try', 'Still no', 'Not in this circle', 'Damage: 0'];
 const LAUGHS = ['ha ha', 'lol', 'hee hee', 'nice try', 'again?', 'ha!', 'so close', 'is that all?'];
-const MAX_INVADERS = 12;
-const invaders = [], links = [];
-let turn = 0, talkId = 0, tries = 0, serial = 0, ticking = false, lastPlay = 0, lastLaugh = 0, hits = [], wall = { x: 0, y: 0, r: 0 }, size = { w: 0, h: 0 };
+const EMBERS = ['#d66248', '#ee9f8c', '#f8d2c8'], TRAILS = { inject: '#ee9f8c', spam: '#d66248', phish: '#7fa3e6', brute: '#a33a4f', mini: '#ee9f8c' };
+const MAX_INVADERS = 12, MAX_MINIS = 18;
+const invaders = [], minis = [], links = [], sparks = [];
+const stored = (key, value) => {
+  try {
+    if (value !== undefined) localStorage.setItem(key, value);
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+};
+const run = { points: 0, best: Number(stored('relay4agent-best')) || 0, combo: 0, lastHit: 0, rank: 0, hits: 0, quip: 0 };
+let turn = 0, talkId = 0, serial = 0, ticking = false, sparking = false, freezeUntil = 0, lastPlay = 0, lastLaugh = 0, lastGiggle = 0, hits = [], quipTimer = null;
+let wall = { x: 0, y: 0, r: 0 }, size = { w: 0, h: 0 }, audio = null, muted = stored('relay4agent-sound') === 'off';
 const pickFrom = list => list[Math.floor(Math.random() * list.length)];
 const svgLine = () => document.createElementNS('http://www.w3.org/2000/svg', 'line');
+
+function ear() {
+  if (muted) return null;
+  if (!audio) {
+    try {
+      audio = new (window.AudioContext || window.webkitAudioContext)();
+    } catch {
+      return null;
+    }
+  }
+  if (audio.state === 'suspended') audio.resume();
+  return audio;
+}
+function note(from, to, time, type, level, delay = 0) {
+  const ctx = ear();
+  if (!ctx) return;
+  const start = ctx.currentTime + delay, osc = ctx.createOscillator(), gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(from, start);
+  osc.frequency.exponentialRampToValueAtTime(Math.max(30, to), start + time);
+  gain.gain.setValueAtTime(level, start);
+  gain.gain.exponentialRampToValueAtTime(.0001, start + time);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(start);
+  osc.stop(start + time + .02);
+}
+const sfx = {
+  launch: () => note(220, 720, .16, 'triangle', .07),
+  boing: (impact, combo) => {
+    const base = (140 + Math.min(impact, 1300) * .12) * (1 + combo * .07);
+    note(base, base * 2.4, .2, 'triangle', .11);
+  },
+  knock: () => note(360, 210, .07, 'square', .04),
+  rank: () => [392, 523, 659, 784, 1047].forEach((f, i) => note(f, f, .2, 'triangle', .08, i * .08)),
+  giggle: () => {
+    const voice = 260 + Math.random() * 200;
+    [1, .92, .84].forEach((m, i) => note(voice * m, voice * m * .7, .08, 'square', .035, i * .1));
+  }
+};
 
 function buildStage() {
   const stage = $('stage');
@@ -736,7 +847,10 @@ function buildStage() {
   mesh.classList.add('mesh');
   mesh.id = 'mesh';
   mesh.setAttribute('aria-hidden', 'true');
-  stage.append(mesh);
+  const fx = document.createElement('canvas');
+  fx.id = 'sparks';
+  fx.setAttribute('aria-hidden', 'true');
+  stage.append(mesh, fx);
   TALK.forEach((a, i) => TALK.slice(i + 1).forEach(b => {
     const line = svgLine();
     mesh.append(line);
@@ -768,6 +882,11 @@ function buildStage() {
   tag.className = 'wall-tag';
   tag.id = 'wall-tag';
   tag.textContent = 'Your private circle';
+  const quip = document.createElement('div');
+  quip.className = 'say quip';
+  quip.id = 'quip';
+  quip.hidden = true;
+  quip.setAttribute('aria-hidden', 'true');
   const controls = document.createElement('div');
   controls.className = 'controls';
   const more = document.createElement('button');
@@ -780,36 +899,53 @@ function buildStage() {
   volleyButton.id = 'volley';
   volleyButton.textContent = 'Fire all';
   volleyButton.onclick = volley;
-  controls.append(more, volleyButton);
+  const sound = document.createElement('button');
+  sound.className = 'tab';
+  sound.id = 'sound';
+  sound.textContent = muted ? 'Sound off' : 'Sound on';
+  sound.onclick = () => {
+    muted = !muted;
+    sound.textContent = muted ? 'Sound off' : 'Sound on';
+    stored('relay4agent-sound', muted ? 'off' : 'on');
+    if (!muted) sfx.knock();
+  };
+  controls.append(more, volleyButton, sound);
   const score = document.createElement('div');
   score.className = 'score';
   score.id = 'score';
   score.hidden = true;
   score.setAttribute('aria-live', 'polite');
-  stage.append(packet, tag, controls, score);
-  HOMES.forEach(home => addInvader(home));
+  stage.append(packet, tag, quip, controls, score);
+  HOMES.forEach(home => addInvader(home, home.kind));
   invaders[2].el.classList.add('hinted');
   invaders[2].jab.textContent = 'Drag me back, let go';
+  renderScore();
 }
-function addInvader(home) {
+function addInvader(home, kind) {
+  const type = KINDS[kind];
   const node = document.createElement('div');
-  node.className = 'node evil';
+  node.className = 'node evil ' + kind;
   node.tabIndex = 0;
   node.setAttribute('role', 'button');
   node.setAttribute('aria-label', 'Invader ' + (serial + 1) + ': drag to launch at the circle. Arrow keys aim, Enter fires.');
   const tile = document.createElement('span');
   tile.className = 'tile';
-  tile.append(faceOf('evil' + serial, true, 3));
+  const face = faceOf('evil' + serial, true, type.face);
+  tile.append(face);
+  if (kind === 'phish') {
+    face.classList.add('true-face');
+    tile.prepend(faceOf('Claude', false, type.face, false, true));
+  }
   const jab = document.createElement('span');
   jab.className = 'jab';
-  jab.textContent = TAUNTS[serial % TAUNTS.length];
+  jab.textContent = type.say;
   node.append(tile, jab);
   const band = svgLine(), aim = svgLine();
   band.classList.add('band');
   aim.classList.add('aim');
   band.style.display = aim.style.display = 'none';
   $('mesh').append(band, aim);
-  const e = { el: node, jab, band, aim, home, spot: null, state: 'idle', hx: 0, hy: 0, x: 0, y: 0, vx: 0, vy: 0, counted: false, started: 0, last: 0, fromX: 0, fromY: 0, homeAt: 0 };
+  const e = { el: node, tile, jab, band, aim, home, kind, spot: null, r: type.r, mass: type.mass, boost: type.speed, state: 'idle', auto: false, split: false, bounces: 0, spin: 0, turn: 1, squash: 0, hx: 0, hy: 0, x: 0, y: 0, vx: 0, vy: 0, counted: false, started: 0, last: 0, fromX: 0, fromY: 0, homeAt: 0 };
   serial++;
   invaders.push(e);
   $('stage').append(node);
@@ -819,12 +955,12 @@ function addInvader(home) {
 function isClear(x, y, self) {
   const box = $('stage').getBoundingClientRect(), hero = document.querySelector('.hero').getBoundingClientRect();
   const buttons = document.querySelector('.controls').getBoundingClientRect();
-  const panel = { left: buttons.left, right: buttons.left + Math.min(340, box.width * .55), top: buttons.top, bottom: buttons.bottom + 44 };
+  const panel = { left: buttons.left, right: buttons.left + Math.min(380, box.width * .7), top: buttons.top, bottom: buttons.bottom + 44 };
   const blocked = rect => x > rect.left - box.left - 26 && x < rect.right - box.left + 26 && y > rect.top - box.top - 26 && y < rect.bottom - box.top + 26;
   if (x < 30 || y < 30 || x > box.width - 30 || y > box.height - 30) return false;
-  if (Math.hypot(x - wall.x, y - wall.y) < wall.r * 1.13 + 36) return false;
+  if (Math.hypot(x - wall.x, y - wall.y) < wall.r * 1.13 + 40) return false;
   if (blocked(hero) || blocked(panel)) return false;
-  return !invaders.some(o => o !== self && Math.hypot(o.hx - x, o.hy - y) < 54);
+  return !invaders.some(o => o !== self && Math.hypot(o.hx - x, o.hy - y) < 56);
 }
 function findRoom(self) {
   for (let i = 0; i < 120; i++) {
@@ -841,9 +977,11 @@ function addMore() {
     setTimeout(() => { more.textContent = 'Add invader'; }, 1200);
     return;
   }
-  const e = addInvader(null);
+  const kind = RECRUITS[(invaders.length - HOMES.length) % RECRUITS.length];
+  const e = addInvader(null, kind);
   e.spot = room;
-  e.el.classList.add('new');
+  e.el.classList.add('new', 'on');
+  setTimeout(() => e.el.classList.remove('on'), 1400);
   placeStage();
 }
 function placeStage() {
@@ -853,8 +991,13 @@ function placeStage() {
   const x = cx * box.width / cols, y = cy * box.height / rows, r = R * box.width / cols;
   wall = { x, y, r };
   size = { w: box.width, h: box.height };
+  const fx = $('sparks');
+  if (fx.width !== Math.round(box.width)) fx.width = Math.round(box.width);
+  if (fx.height !== Math.round(box.height)) fx.height = Math.round(box.height);
   $('wall-tag').style.left = x + 'px';
   $('wall-tag').style.top = y - r + 'px';
+  $('quip').style.left = x + 'px';
+  $('quip').style.top = y + 'px';
   TALK.forEach((agent, i) => {
     const a = (i * 360 / TALK.length - 135) * Math.PI / 180, reach = r * (narrow ? .64 : .55);
     const dx = Math.cos(a) * reach, dy = Math.sin(a) * reach;
@@ -930,9 +1073,13 @@ function talk(id) {
 function resetStage() {
   for (const e of invaders) {
     e.state = 'idle';
-    e.el.classList.remove('on', 'hit', 'held');
+    e.vx = e.vy = e.spin = e.squash = 0;
+    e.tile.style.transform = '';
+    e.el.classList.remove('on', 'held', 'unmasked');
     e.band.style.display = e.aim.style.display = 'none';
   }
+  minis.splice(0).forEach(m => m.el.remove());
+  sparks.length = 0;
   TALK.forEach(agent => agent.el.classList.remove('laugh'));
   links.forEach(({ line }) => line.classList.remove('live'));
 }
@@ -944,7 +1091,7 @@ function moveTo(e, x, y) {
   e.el.style.top = y + 'px';
 }
 function drawAim(e) {
-  const dx = e.hx - e.x, dy = e.hy - e.y;
+  const dx = e.hx - e.x, dy = e.hy - e.y, length = Math.hypot(dx, dy) || 1;
   e.band.style.display = e.aim.style.display = e.state === 'drag' ? '' : 'none';
   for (const line of [e.band, e.aim]) {
     line.setAttribute('x1', e.hx);
@@ -952,8 +1099,12 @@ function drawAim(e) {
   }
   e.band.setAttribute('x2', e.x);
   e.band.setAttribute('y2', e.y);
-  e.aim.setAttribute('x2', e.hx + dx * 1.8);
-  e.aim.setAttribute('y2', e.hy + dy * 1.8);
+  const ux = dx / length, uy = dy / length, fx = e.hx - wall.x, fy = e.hy - wall.y, limit = wall.r * 1.13 + e.r;
+  const b = fx * ux + fy * uy, gap = b * b - (fx * fx + fy * fy - limit * limit);
+  const reach = gap >= 0 && -b - Math.sqrt(gap) > 0 ? -b - Math.sqrt(gap) : length * 1.8;
+  const endX = e.hx + ux * reach, endY = e.hy + uy * reach;
+  e.aim.setAttribute('x2', endX);
+  e.aim.setAttribute('y2', endY);
 }
 function aimAt(e, x, y) {
   const dx = x - e.hx, dy = y - e.hy, length = Math.hypot(dx, dy), fit = Math.min(1, 130 / (length || 1));
@@ -965,13 +1116,18 @@ function played() {
   const guide = invaders[2];
   if (!guide.el.classList.contains('hinted')) return;
   guide.el.classList.remove('hinted', 'on');
-  guide.jab.textContent = TAUNTS[2];
+  guide.jab.textContent = KINDS[guide.kind].say;
 }
-function shoot(e, vx, vy) {
+function shoot(e, vx, vy, auto = false) {
   e.vx = vx;
   e.vy = vy;
   e.state = 'fly';
+  e.auto = auto;
+  e.split = false;
   e.counted = false;
+  e.bounces = 0;
+  e.spin = 0;
+  e.turn = Math.random() < .5 ? -1 : 1;
   e.started = e.last = performance.now();
   e.el.classList.remove('on', 'held');
   drawAim(e);
@@ -987,71 +1143,224 @@ function launch(e) {
     return;
   }
   played();
-  shoot(e, dx * 9, dy * 9);
+  sfx.launch();
+  shoot(e, dx * 9 * e.boost, dy * 9 * e.boost);
 }
 function volley() {
   played();
+  sfx.launch();
   const id = talkId;
   for (const e of invaders) {
     if (e.state !== 'idle') continue;
     setTimeout(() => {
       if (id !== talkId || e.state !== 'idle') return;
-      const a = Math.atan2(wall.y - e.hy, wall.x - e.hx) + (Math.random() - .5) * .24, speed = 850 + Math.random() * 350;
+      const a = Math.atan2(wall.y - e.hy, wall.x - e.hx) + (Math.random() - .5) * .3, speed = (850 + Math.random() * 350) * e.boost;
       shoot(e, Math.cos(a) * speed, Math.sin(a) * speed);
     }, Math.random() * 220);
   }
 }
-function laugh() {
+function burst(x, y, count, colors, force) {
+  if (still) return;
+  for (let i = 0; i < count && sparks.length < 320; i++) {
+    const a = Math.random() * TAU, speed = force * (.3 + Math.random());
+    sparks.push({ x, y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, life: 1, fade: 1.4 + Math.random() * 1.6, size: 3 + Math.floor(Math.random() * 4), color: pickFrom(colors) });
+  }
+  glow();
+}
+function glow() {
+  if (sparking) return;
+  sparking = true;
+  let last = performance.now();
+  const step = now => {
+    const dt = Math.min(.04, (now - last) / 1000), cv = $('sparks'), ctx = cv.getContext('2d');
+    last = now;
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    for (let i = sparks.length - 1; i >= 0; i--) {
+      const s = sparks[i];
+      s.life -= s.fade * dt;
+      if (s.life <= 0) { sparks.splice(i, 1); continue; }
+      s.x += s.vx * dt;
+      s.y += s.vy * dt;
+      s.vx *= .97;
+      s.vy *= .97;
+      ctx.globalAlpha = Math.min(1, s.life * 1.5);
+      ctx.fillStyle = s.color;
+      ctx.fillRect(Math.round(s.x), Math.round(s.y), s.size, s.size);
+    }
+    ctx.globalAlpha = 1;
+    if (sparks.length) requestAnimationFrame(step);
+    else sparking = false;
+  };
+  requestAnimationFrame(step);
+}
+function floater(x, y, text, kind) {
+  const ha = document.createElement('span');
+  ha.className = kind ? 'ha ' + kind : 'ha';
+  ha.textContent = text;
+  ha.style.left = x + 'px';
+  ha.style.top = y + 'px';
+  ha.setAttribute('aria-hidden', 'true');
+  $('stage').append(ha);
+  setTimeout(() => ha.remove(), 1000);
+}
+function laugh(quiet) {
   const now = performance.now();
   hits = hits.filter(time => now - time < 1000);
   hits.push(now);
   if (now - lastLaugh < 220) return;
   lastLaugh = now;
+  if (!quiet && now - lastGiggle > 500) {
+    lastGiggle = now;
+    sfx.giggle();
+  }
   const crowd = hits.length >= 3 ? TALK : [...TALK].sort(() => Math.random() - .5).slice(0, 2);
   for (const bot of crowd) {
     bot.el.classList.add('laugh');
     clearTimeout(bot.calm);
     bot.calm = setTimeout(() => bot.el.classList.remove('laugh'), 1100);
-    const ha = document.createElement('span');
-    ha.className = 'ha';
-    ha.textContent = pickFrom(LAUGHS);
-    ha.style.left = bot.x + (Math.random() - .5) * 36 + 'px';
-    ha.style.top = bot.y - 34 + 'px';
-    ha.setAttribute('aria-hidden', 'true');
-    $('stage').append(ha);
-    setTimeout(() => ha.remove(), 1000);
+    floater(bot.x + (Math.random() - .5) * 36, bot.y - 34, pickFrom(LAUGHS));
   }
 }
-function bump(e, nx, ny) {
-  const ring = $('ring');
-  flashes.push({ a: Math.atan2(ny, nx), until: performance.now() + 800 });
-  ring.classList.remove('jolt');
-  void ring.offsetWidth;
-  ring.classList.add('jolt');
-  e.el.classList.add('hit');
-  setTimeout(() => e.el.classList.remove('hit'), 350);
-  if (!e.counted) {
+function showQuip(who, text) {
+  const quip = $('quip'), small = document.createElement('small');
+  small.textContent = who;
+  quip.replaceChildren(small, text);
+  quip.hidden = false;
+  $('stage').classList.add('quipping');
+  clearTimeout(quipTimer);
+  quipTimer = setTimeout(() => {
+    quip.hidden = true;
+    $('stage').classList.remove('quipping');
+  }, 3200);
+}
+function renderScore() {
+  const score = $('score');
+  if (!run.hits && !run.best) return;
+  score.hidden = false;
+  const total = document.createElement('b');
+  total.textContent = run.points.toLocaleString();
+  score.replaceChildren(total, ' pts · ' + RANKS[run.rank][1] + ' · 0 got in');
+  if (run.best > run.points) score.append(' · Best ' + run.best.toLocaleString());
+  if (run.hits >= 3) {
+    const nudge = document.createElement('span');
+    nudge.className = 'nudge';
+    nudge.textContent = '. Build your own wall.';
+    score.append(nudge);
+  }
+}
+function award(gain) {
+  run.points += gain;
+  if (run.points > run.best) {
+    run.best = run.points;
+    stored('relay4agent-best', run.best);
+  }
+  let promoted = false;
+  while (run.rank < RANKS.length - 1 && run.points >= RANKS[run.rank + 1][0]) {
+    run.rank++;
+    promoted = true;
+  }
+  if (promoted) {
+    const banner = document.createElement('div');
+    banner.className = 'rankup';
+    banner.textContent = 'New rank: ' + RANKS[run.rank][1];
+    banner.style.left = wall.x + 'px';
+    banner.style.top = wall.y - wall.r * .74 + 'px';
+    banner.setAttribute('aria-hidden', 'true');
+    $('stage').append(banner);
+    setTimeout(() => banner.remove(), 1800);
+    sfx.rank();
+  }
+  renderScore();
+}
+function spawnMini(x, y, a, speed, auto) {
+  if (minis.length >= MAX_MINIS) return;
+  const node = document.createElement('div');
+  node.className = 'node evil mini';
+  node.setAttribute('aria-hidden', 'true');
+  const tile = document.createElement('span');
+  tile.className = 'tile';
+  tile.append(faceOf('evil' + (serial + minis.length), true, 2));
+  node.append(tile);
+  $('stage').append(node);
+  const m = { el: node, tile, mini: true, kind: 'mini', r: 13, mass: .5, state: 'fly', auto, split: true, bounces: 0, spin: 0, turn: Math.random() < .5 ? -1 : 1, squash: 0, x, y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, counted: true, started: performance.now(), last: performance.now() };
+  moveTo(m, x, y);
+  minis.push(m);
+  wake();
+}
+function dropMini(m) {
+  m.state = 'gone';
+  m.el.remove();
+  minis.splice(minis.indexOf(m), 1);
+}
+function shakeWall(big) {
+  const entry = $('entry'), ring = $('ring');
+  if (big) {
+    entry.classList.remove('quake');
+    void entry.offsetWidth;
+    entry.classList.add('quake');
+  } else {
+    ring.classList.remove('jolt');
+    void ring.offsetWidth;
+    ring.classList.add('jolt');
+  }
+}
+function bump(e, nx, ny, impact) {
+  const now = performance.now(), a = Math.atan2(ny, nx);
+  const x = wall.x + nx * wall.r * 1.13, y = wall.y + ny * wall.r * 1.13;
+  const brute = e.kind === 'brute';
+  flashes.push({ a, until: now + 800 });
+  if (dents.length < 6 && !still) dents.push({ a, at: now, size: Math.min(.14, .02 + impact / 12000) * (brute ? 1.8 : 1) * (e.mini ? .4 : 1) });
+  e.squash = .3;
+  burst(x, y, e.mini ? 4 : brute ? 20 : 12, EMBERS, 240);
+  shakeWall(brute);
+  if (brute) freezeUntil = now + 55;
+  if (e.kind === 'phish' && !e.el.classList.contains('unmasked')) e.el.classList.add('unmasked');
+  if (e.kind === 'spam' && !e.split) {
+    e.split = true;
+    const heading = Math.atan2(e.vy, e.vx), speed = Math.max(420, Math.hypot(e.vx, e.vy) * .8);
+    [-.75, 0, .75].forEach(off => spawnMini(e.x + nx * 14, e.y + ny * 14, heading + off, speed, e.auto));
+  }
+  if (e.auto) {
+    laugh(true);
+    return;
+  }
+  run.combo = now - run.lastHit < 1200 ? Math.min(run.combo + 1, 6) : 1;
+  run.lastHit = now;
+  e.bounces++;
+  const first = !e.counted && !e.mini;
+  if (first) {
     e.counted = true;
-    tries++;
-    const score = $('score');
-    score.hidden = false;
-    score.textContent = tries + (tries === 1 ? ' attempt' : ' attempts') + ', 0 got in';
-    if (tries >= 3) {
-      const nudge = document.createElement('span');
-      nudge.className = 'nudge';
-      nudge.textContent = '. Build your own wall.';
-      score.append(nudge);
-    }
+    run.hits++;
+  }
+  let gain = Math.round((10 + impact / 40) * (brute ? 2 : 1) * (e.mini ? .4 : 1) / 5) * 5 * run.combo;
+  if (e.bounces > 1) gain += 15 * (e.bounces - 1);
+  if (!e.mini) floater(x + nx * 36, y + ny * 36, '+' + gain.toLocaleString() + (run.combo > 1 ? ' x' + run.combo : ''), 'gain');
+  if (first) {
     const tag = document.createElement('div');
     tag.className = 'stopped';
-    tag.textContent = LINES[(tries - 1) % LINES.length];
-    tag.style.left = wall.x + nx * wall.r * 1.13 + 'px';
-    tag.style.top = wall.y + ny * wall.r * 1.13 + 'px';
+    tag.textContent = e.kind === 'phish' ? 'Not Claude' : LINES[(run.hits - 1) % LINES.length];
+    tag.style.left = x + 'px';
+    tag.style.top = y + 'px';
     tag.setAttribute('aria-hidden', 'true');
     $('stage').append(tag);
     setTimeout(() => tag.remove(), 900);
   }
-  laugh();
+  if (!e.mini || run.combo < 3) sfx.boing(impact, run.combo);
+  award(gain);
+  laugh(false);
+  while (run.quip < QUIPS.length && run.hits >= QUIPS[run.quip][0]) {
+    showQuip(QUIPS[run.quip][1], QUIPS[run.quip][2]);
+    run.quip++;
+  }
+}
+function keepOut(e) {
+  const dx = e.x - wall.x, dy = e.y - wall.y, dist = Math.hypot(dx, dy) || 1, limit = wall.r * 1.13 + e.r;
+  if (dist < limit) moveTo(e, wall.x + dx / dist * limit, wall.y + dy / dist * limit);
+}
+function pose(e, dt) {
+  e.spin += Math.hypot(e.vx, e.vy) * dt * .35 * e.turn;
+  e.squash *= Math.pow(.86, dt * 60);
+  e.tile.style.transform = 'rotate(' + e.spin + 'deg) scale(' + (1 + e.squash) + ',' + (1 - e.squash) + ')';
 }
 function flyStep(e, now) {
   const dt = Math.max(0, Math.min(.032, (now - e.last) / 1000)), slow = Math.pow(.992, dt * 60);
@@ -1059,7 +1368,7 @@ function flyStep(e, now) {
   e.vx *= slow;
   e.vy *= slow;
   let x = e.x + e.vx * dt, y = e.y + e.vy * dt;
-  const pad = 22;
+  const pad = e.r + 2;
   if (x < pad || x > size.w - pad) {
     e.vx *= -.7;
     x = Math.min(size.w - pad, Math.max(pad, x));
@@ -1068,20 +1377,32 @@ function flyStep(e, now) {
     e.vy *= -.7;
     y = Math.min(size.h - pad, Math.max(pad, y));
   }
-  const dx = x - wall.x, dy = y - wall.y, dist = Math.hypot(dx, dy) || 1, limit = wall.r * 1.13 + 20;
+  const dx = x - wall.x, dy = y - wall.y, dist = Math.hypot(dx, dy) || 1, limit = wall.r * 1.13 + e.r;
   if (dist < limit) {
     const nx = dx / dist, ny = dy / dist, into = e.vx * nx + e.vy * ny;
+    x = wall.x + nx * limit;
+    y = wall.y + ny * limit;
+    moveTo(e, x, y);
     if (into < 0) {
       e.vx -= 1.85 * into * nx;
       e.vy -= 1.85 * into * ny;
-      bump(e, nx, ny);
+      bump(e, nx, ny, -into);
     }
-    x = wall.x + nx * limit;
-    y = wall.y + ny * limit;
   }
   moveTo(e, x, y);
-  if (Math.hypot(e.vx, e.vy) < 36 || now - e.started > 3600) {
+  pose(e, dt);
+  const speed = Math.hypot(e.vx, e.vy);
+  if (!still && speed > 320 && sparks.length < 300) {
+    sparks.push({ x: x - 2, y: y - 2, vx: 0, vy: 0, life: .5, fade: 1.6, size: e.mini ? 3 : 5, color: TRAILS[e.kind] });
+    glow();
+  }
+  if (speed < 36 || now - e.started > (e.mini ? 1500 : 3600)) {
+    if (e.mini) {
+      dropMini(e);
+      return;
+    }
     e.state = 'home';
+    e.spin %= 360;
     e.fromX = x;
     e.fromY = y;
     e.homeAt = now;
@@ -1090,11 +1411,59 @@ function flyStep(e, now) {
 function homeStep(e, now) {
   const t = Math.max(0, Math.min(1, (now - e.homeAt) / 450)), eased = t * t * (3 - 2 * t);
   moveTo(e, e.fromX + (e.hx - e.fromX) * eased, e.fromY + (e.hy - e.fromY) * eased);
-  if (t === 1) e.state = 'idle';
+  e.tile.style.transform = 'rotate(' + e.spin * (1 - eased) + 'deg)';
+  if (t < 1) return;
+  e.state = 'idle';
+  e.vx = e.vy = e.spin = e.squash = 0;
+  e.tile.style.transform = '';
+  e.el.classList.remove('unmasked');
+}
+function collide(now) {
+  const all = invaders.concat(minis);
+  for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) {
+    const a = all[i], b = all[j];
+    if (a.state !== 'fly' && b.state !== 'fly') continue;
+    if ((a.state !== 'fly' && a.state !== 'idle') || (b.state !== 'fly' && b.state !== 'idle')) continue;
+    const dx = b.x - a.x, dy = b.y - a.y, dist = Math.hypot(dx, dy) || 1, reach = a.r + b.r;
+    if (dist >= reach) continue;
+    const nx = dx / dist, ny = dy / dist, rel = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny;
+    if (rel <= 0) continue;
+    const by = a.state === 'fly' ? a : b, kick = 1.9 * rel / (1 / a.mass + 1 / b.mass);
+    a.vx -= kick / a.mass * nx;
+    a.vy -= kick / a.mass * ny;
+    b.vx += kick / b.mass * nx;
+    b.vy += kick / b.mass * ny;
+    for (const piece of [a, b]) {
+      if (piece.state !== 'idle') continue;
+      piece.state = 'fly';
+      piece.auto = by.auto;
+      piece.split = false;
+      piece.counted = false;
+      piece.bounces = 0;
+      piece.turn = Math.random() < .5 ? -1 : 1;
+      piece.started = piece.last = now;
+      piece.el.classList.remove('on');
+    }
+    const push = (reach - dist) / 2;
+    moveTo(a, a.x - nx * push, a.y - ny * push);
+    moveTo(b, b.x + nx * push, b.y + ny * push);
+    keepOut(a);
+    keepOut(b);
+    burst(a.x + nx * a.r, a.y + ny * a.r, 5, EMBERS, 150);
+    if (!by.auto) {
+      sfx.knock();
+      award(5);
+    }
+  }
 }
 function tick(now) {
-  const moving = invaders.filter(e => e.state === 'fly' || e.state === 'home');
-  moving.forEach(e => (e.state === 'fly' ? flyStep(e, now) : homeStep(e, now)));
+  const moving = invaders.concat(minis).filter(e => e.state === 'fly' || e.state === 'home');
+  if (now < freezeUntil) {
+    moving.forEach(e => { e.last = now; });
+  } else {
+    moving.forEach(e => (e.state === 'fly' ? flyStep(e, now) : homeStep(e, now)));
+    collide(now);
+  }
   if (moving.length) requestAnimationFrame(tick);
   else ticking = false;
 }
@@ -1112,7 +1481,7 @@ function prowl(id) {
     setTimeout(() => {
       if (id !== talkId || e.state !== 'idle') return;
       const a = Math.atan2(wall.y - e.hy, wall.x - e.hx);
-      shoot(e, Math.cos(a) * 620, Math.sin(a) * 620);
+      shoot(e, Math.cos(a) * 620, Math.sin(a) * 620, true);
     }, 1100);
   }
   setTimeout(() => prowl(id), 4200);
@@ -1153,8 +1522,7 @@ function wire(e) {
 }
 
 function runRing(on) {
-  clearInterval(timer);
-  timer = null;
+  ringRun++;
   talkId++;
   resetStage();
   if (!on) return;
@@ -1162,8 +1530,9 @@ function runRing(on) {
   placeStage();
   if (invaders[2].el.classList.contains('hinted')) invaders[2].el.classList.add('on');
   talk(talkId);
-  if (!still) prowl(talkId);
-  if (!still) timer = setInterval(() => { phase += .012; paintRing(); }, 120);
+  if (still) return;
+  prowl(talkId);
+  ringLoop(ringRun);
 }
 addEventListener('resize', () => {
   if ($('entry').hidden) return;
