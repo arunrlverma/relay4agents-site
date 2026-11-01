@@ -125,7 +125,7 @@ body:not(.inside) .bar { display: none; }
 @keyframes rise-away { to { opacity: 0; transform: translate(-50%, -190%); } }
 .corner { position: absolute; z-index: 3; top: 14px; right: var(--edge); display: grid; grid-template-columns: auto auto; align-items: center; gap: 0 8px; padding: 6px 12px; border-radius: 12px; background: var(--paper); pointer-events: none; }
 .corner svg { grid-row: 1 / 3; width: 22px; height: 22px; display: block; }
-.corner span { font: 600 16px/1.1 var(--head); letter-spacing: -.01em; }
+.corner > span { font: 600 16px/1.1 var(--head); letter-spacing: -.01em; }
 .corner small { color: var(--steel-text); font: 400 10px/1.2 var(--mono); }
 .controls { position: absolute; z-index: 3; top: 16px; left: var(--edge); display: flex; gap: 6px; pointer-events: auto; }
 .tab.fire { background: var(--alert); border-color: var(--alert); color: var(--paper); }
@@ -270,7 +270,7 @@ input::placeholder { color: var(--steel-text); }
   .controls .tab { padding: 6px 8px; font-size: 12px; }
   .corner { top: 12px; gap: 0 6px; padding: 4px 8px; }
   .corner svg { width: 18px; height: 18px; }
-  .corner span { font-size: 14px; }
+  .corner > span { font-size: 14px; }
   .hero { gap: 10px; padding-bottom: 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
