@@ -276,18 +276,27 @@ body:not(.inside) .bar { display: none; }
   .score b { color: var(--ink); }
   .score .more { display: none; }
   .mode button { padding: 5px 12px 6px; font-size: 13px; }
-  .stage.pair .say { max-width: 124px; padding: 5px 9px; font-size: 12px; }
-  .stage.pair .say small { display: none; }
+  .tile { width: 30px; height: 30px; border-radius: 9px; }
+  .node:not(.mini) .tile canvas { width: 22px !important; height: 22px !important; }
+  .node { gap: 2px; }
+  .node b { padding: 0 7px 1px; font-size: 11px; }
+  .node.evil .tile { width: 32px; height: 32px; border-radius: 10px; }
+  .node.brute .tile { width: 42px; height: 42px; border-radius: 12px; }
+  .node.brute .tile canvas { width: 33px !important; height: 33px !important; }
+  .node.ext .tile { outline-width: 1.5px; outline-offset: 2px; }
+  .jab { padding: 2px 8px; font-size: 11px; }
+  .wall-tag { padding: 2px 9px; font-size: 11px; }
+  .mesh line { stroke-width: 1.5; stroke-dasharray: 2 6; }
+  .packet { width: 10px; height: 10px; margin: -5px 0 0 -5px; box-shadow: 0 0 0 2px var(--accent-deep); }
+  .say, .stage.pair .say { max-width: 136px; padding: 5px 9px; font-size: 12px; }
+  .say small { display: none; }
 }
 @media (max-width: 899px) and (max-height: 620px) {
   .hero { gap: 8px; padding-top: 8px; }
   .hero h1 { font-size: 26px; }
   .hero p span { padding: 3px 10px 4px; font-size: 13px; }
   .pill { padding-top: 10px; padding-bottom: 10px; }
-  .tile { width: 34px; height: 34px; border-radius: 10px; }
-  .node b { padding: 0 7px 1px; font-size: 12px; }
   .say, .stage.pair .say { max-width: 118px; padding: 4px 8px; font-size: 11px; }
-  .say small { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
@@ -735,7 +744,7 @@ const KINDS = {
   brute: { say: 'Is the password 1234?', r: 28, mass: 2.4, speed: .8, face: 4 }
 };
 const HOMES = [
-  { wide: -45, tall: -60, kind: 'spam' },
+  { wide: -45, tall: -40, kind: 'spam' },
   { wide: 25, tall: 60, kind: 'phish' },
   { wide: 125, tall: 125, kind: 'inject' }
 ];
@@ -932,7 +941,7 @@ function addInvader(home, kind) {
   aim.classList.add('aim');
   band.style.display = aim.style.display = 'none';
   $('mesh').append(band, aim);
-  const e = { el: node, tile, jab, band, aim, home, kind, spot: null, r: type.r, mass: type.mass, boost: type.speed, state: 'idle', auto: false, split: false, bounces: 0, spin: 0, turn: 1, squash: 0, hx: 0, hy: 0, x: 0, y: 0, vx: 0, vy: 0, counted: false, started: 0, last: 0, fromX: 0, fromY: 0, homeAt: 0 };
+  const e = { el: node, tile, jab, band, aim, home, kind, spot: null, r: type.r * (innerWidth < 640 ? .8 : 1), mass: type.mass, boost: type.speed, state: 'idle', auto: false, split: false, bounces: 0, spin: 0, turn: 1, squash: 0, hx: 0, hy: 0, x: 0, y: 0, vx: 0, vy: 0, counted: false, started: 0, last: 0, fromX: 0, fromY: 0, homeAt: 0 };
   serial++;
   invaders.push(e);
   $('stage').append(node);
