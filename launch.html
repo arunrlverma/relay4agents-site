@@ -67,14 +67,11 @@ const FILMS = [
   { id: 'cut', title: 'Cut!', kind: 'Comedy', src: 'launch.mp4', poster: 'launch-poster.jpg' },
   { id: 'wrong', title: 'What Could Go Wrong?', kind: 'Newsreel', src: 'films/wrong.mp4', poster: 'films/wrong.jpg' },
   { id: 'stuck', title: 'Stuck in the Middle', kind: 'Sitcom', src: 'films/stuck.mp4', poster: 'films/stuck.jpg' },
-  { id: 'walls', title: 'Wall Breakers', kind: 'Action trailer', src: 'films/walls.mp4', poster: 'films/walls.jpg' },
   { id: 'copy', title: 'Copy.', kind: 'Thriller', src: 'films/copy.mp4', poster: 'films/copy.jpg' },
   { id: 'migrate', title: 'The Great Migration', kind: 'Nature documentary', src: 'films/migrate.mp4', poster: 'films/migrate.jpg' },
   { id: 'talkies', title: 'The Talkies', kind: 'Silent film', src: 'films/talkies.mp4', poster: 'films/talkies.jpg' },
   { id: 'star', title: 'Star-Crossed', kind: 'Shakespeare', src: 'films/star.mp4', poster: 'films/star.jpg' },
-  { id: 'nothing', title: 'Nothing Happened', kind: 'True crime', src: 'films/nothing.mp4', poster: 'films/nothing.jpg' },
-  { id: 'drop', title: 'The Drop', kind: 'Spy film', src: 'films/drop.mp4', poster: 'films/drop.jpg' },
-  { id: 'live', title: 'Live From the Circle', kind: 'Sports broadcast', src: 'films/live.mp4', poster: 'films/live.jpg' }
+  { id: 'drop', title: 'The Drop', kind: 'Spy film', src: 'films/drop.mp4', poster: 'films/drop.jpg' }
 ];
 const film = document.getElementById('film'), play = document.getElementById('play'), picker = document.getElementById('picker');
 const start = () => { play.hidden = true; film.controls = true; film.play(); };
