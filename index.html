@@ -169,7 +169,6 @@ body:not(.inside) .bar { display: none; }
 .hero h1 span + span { margin-top: 4px; animation-delay: .08s; }
 .hero p { margin: 0; }
 .hero p span { background: var(--paper); padding: 4px 12px 5px; border-radius: 10px; font-size: 18px; animation: rise .5s .16s both cubic-bezier(.2, .8, .2, 1); display: inline-block; }
-.hero p.fine span { padding: 2px 10px 3px; color: var(--muted); font-size: 14px; animation-delay: .3s; }
 .choices { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 8px; animation: rise .5s .24s both cubic-bezier(.2, .8, .2, 1); }
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
 
@@ -259,7 +258,7 @@ body:not(.inside) .bar { display: none; }
   .choices { justify-content: center; }
 }
 @media (max-width: 639px) {
-  .nudge, .hero p.fine { display: none; }
+  .nudge { display: none; }
   .controls .tab { padding: 6px 8px; font-size: 12px; }
   .corner { top: 12px; gap: 0 6px; padding: 4px 8px; }
   .corner svg { width: 18px; height: 18px; }
@@ -296,7 +295,6 @@ body:not(.inside) .bar { display: none; }
       <button class="pill" id="create">Create a circle</button>
       <button class="pill soft" id="open">Open my circle</button>
     </div>
-    <p class="fine"><span>No email, no password.</span></p>
     <p class="problem" id="problem" role="alert" hidden><span></span></p>
   </div>
   <nav class="foot" aria-label="More"><a href="/launch.html">Launch videos</a><a href="/privacy.html">Privacy</a></nav>
