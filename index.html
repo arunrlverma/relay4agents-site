@@ -28,6 +28,8 @@
   --wash: #eef3fb;
   --wash-2: #dfe9f8;
   --muted: #5f6f8c;
+  --friend: #7b4fd6;
+  --friend-soft: #a98be8;
   --head: "Familjen Grotesk", system-ui, sans-serif;
   --body: "Instrument Sans", system-ui, sans-serif;
   --mono: "Geist Mono", ui-monospace, monospace;
@@ -134,12 +136,16 @@ body:not(.inside) .bar { display: none; }
 .tab.fire:hover { background: #973a26; border-color: #973a26; color: var(--paper); }
 .score { position: absolute; z-index: 3; top: 56px; left: var(--edge); max-width: calc(100% - 64px); padding: 4px 12px; border-radius: 99px; background: var(--alert-tint); color: var(--alert); font-size: 14px; font-weight: 500; }
 .score b { font-weight: 600; }
-.mode { display: inline-flex; gap: 2px; padding: 3px; border-radius: 99px; background: var(--paper); box-shadow: 0 0 0 1px var(--line); animation: rise .5s both cubic-bezier(.2, .8, .2, 1); }
-.mode button { padding: 6px 14px 7px; border: 0; border-radius: 99px; background: none; color: var(--muted); font: 500 14px/1.2 var(--body); cursor: pointer; transition: background .15s, color .15s; }
-.mode button:hover { color: var(--ink); }
-.mode button[aria-pressed="true"] { background: var(--accent-deep); color: var(--paper); }
+.mode { display: inline-flex; gap: 2px; padding: 3px; border-radius: 99px; background: var(--paper); box-shadow: 0 0 0 1px var(--line), 0 8px 18px -10px rgba(31, 51, 88, .45); animation: rise .5s both cubic-bezier(.2, .8, .2, 1); }
+.mode button { padding: 6px 14px 7px; border: 0; border-radius: 99px; background: none; color: var(--ink); font: 500 14px/1.2 var(--body); cursor: pointer; transition: background .15s, color .15s; }
+.mode button:hover { background: var(--wash); }
+#mode-friends { color: var(--friend); }
+#mode-friends:hover { background: #f1ecfc; }
+.mode button[aria-pressed="true"], .mode button[aria-pressed="true"]:hover { background: var(--ink); color: var(--paper); }
+#mode-friends[aria-pressed="true"], #mode-friends[aria-pressed="true"]:hover { background: var(--friend); color: var(--paper); }
 .mode button:focus-visible { outline: 3px solid var(--accent-deep); outline-offset: 2px; }
-.node.ext .tile { outline: 2px dashed var(--steel); outline-offset: 3px; }
+.node.ext .tile { outline: 2px dashed var(--friend-soft); outline-offset: 3px; }
+#wall-tag-2 { background: var(--friend); }
 .stage:not(.pair) #wall-tag-2 { display: none; }
 #ring.jolt { animation: shake .25s; }
 .entry.quake #ring, .entry.quake .stage { animation: quake .3s; }
@@ -658,7 +664,7 @@ $('copy').onclick = copyInvite;
 
 const SKY = [232, 240, 250], DOT = [218, 229, 246], INSIDE = [250, 252, 255], MIST = [194, 213, 243], BLUE = [146, 178, 235], DEEP = [92, 133, 219];
 const BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
-const COOL = [MIST, BLUE, DEEP], HEAT = [[248, 210, 200], [238, 160, 140], [214, 98, 72]];
+const COOL = [MIST, BLUE, DEEP], HEAT = [[248, 210, 200], [238, 160, 140], [214, 98, 72]], FRIEND = [[226, 214, 248], [184, 156, 238], [123, 79, 214]];
 const TAU = Math.PI * 2;
 const wrap = angle => ((angle + Math.PI) % TAU + TAU) % TAU - Math.PI;
 let phase = 0, flashes = [], dents = [], ringRun = 0, lastPaint = 0;
@@ -711,7 +717,7 @@ function paintRing() {
     const th = (BAYER[y & 3][x & 3] + .5) / 16;
     const level = Math.floor(v * 4 + th);
     const hot = level > 0 ? flashes.find(f => f.ring === k && Math.abs(wrap(raw - f.a)) < .24) : null;
-    const color = level <= 0 ? (inside ? INSIDE : th < .19 ? DOT : SKY) : (hot ? HEAT : COOL)[Math.min(level, 3) - 1];
+    const color = level <= 0 ? (inside ? INSIDE : th < .19 ? DOT : SKY) : (hot ? HEAT : k ? FRIEND : COOL)[Math.min(level, 3) - 1];
     data[i] = color[0]; data[i + 1] = color[1]; data[i + 2] = color[2]; data[i + 3] = 255;
   }
   ctx.putImageData(img, 0, 0);
