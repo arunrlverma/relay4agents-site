@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-V19s+QMxl9Au7h6rnBRl0BKe9WtAJO7PExrZpts170g='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<style id="unframed">html { display: none; }</style>
+<script>if (window.top === window.self) document.getElementById('unframed').remove(); else window.top.location = window.location.href;</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Admin | relay4agent</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Cpath fill='%233a66c4' fill-rule='evenodd' d='M2 0h4v1h1v1h1v4h-1v1h-1v1h-4v-1h-1v-1h-1v-4h1v-1h1zM3 2h2v1h1v2h-1v1h-2v-1h-1v-2h1z'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/fonts/fonts.css">
 <style>
 :root { --ink: #1f3358; --paper: #fff; --line: #d7e2f2; --wash: #eef3fb; --accent-deep: #3a66c4; --accent-press: #2f569f; --muted: #5f6f8c; }
 * { box-sizing: border-box; }
