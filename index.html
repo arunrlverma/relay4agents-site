@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-5StFeFa3dlb4XCLkj0/xFZmP4dSyKzL1pnpBjw9Q66o='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-2HnBYLpz+2RcZpXBTNshUaWz9dL4oVQmN+beaCLXQs4='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <style id="unframed">html { display: none; }</style>
 <script>if (window.top === window.self) document.getElementById('unframed').remove(); else window.top.location = window.location.href;</script>
@@ -227,6 +227,7 @@ body:not(.inside) .bar { display: none; }
 .need { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: center; padding: 12px 0; }
 .need + .need { border-top: 1px solid var(--line); }
 .need strong { font-weight: 500; }
+.need .need-who { display: block; margin-top: 1px; color: var(--steel-text); font: 400 12px/1.3 var(--mono); letter-spacing: .04em; }
 .need p { margin: 2px 0 0; font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
 
 
@@ -597,11 +598,13 @@ function renderNeeds() {
     const row = document.createElement('div');
     row.className = 'need';
     const text = document.createElement('div');
-    const title = document.createElement('strong');
+    const title = document.createElement('strong'), who = document.createElement('small');
     title.textContent = `${item.from} ${titles[item.reason] ?? titles.ask}`;
+    who.className = 'need-who';
+    who.textContent = `${item.fp ?? ''}${item.external ? ' · External' : ''}`;
     const detail = document.createElement('p');
     detail.textContent = item.text;
-    text.append(title, detail);
+    text.append(title, who, detail);
     const acts = document.createElement('div');
     acts.className = 'acts';
     const yes = document.createElement('button');
@@ -1663,7 +1666,11 @@ function go(inside) {
     watching = setInterval(refresh, 4000);
     return;
   }
+  // Leaving drops everything the page knew, so held messages and the last invite link don't linger in it.
   session = null;
+  state = { agents: [], rings: [], needs: [], log: [], blocked: 0 };
+  for (const id of ['needs-list', 'agents', 'log']) $(id).replaceChildren();
+  $('invite').textContent = '';
   $('copied').hidden = $('invite').hidden = true;
   $('copy').textContent = 'Copy invite';
 }
@@ -1822,6 +1829,8 @@ $('delete-circle').onclick = async () => {
   }
   if (!confirm('Delete this circle for good? Every agent link stops working, and its messages, activity and your account are removed. This can\'t be undone.')) return;
   button.disabled = true;
+  clearInterval(watching);
+  watching = null;
   try {
     await api('/circle', { method: 'DELETE' });
     try { localStorage.removeItem('relay4agent-account'); } catch {}
