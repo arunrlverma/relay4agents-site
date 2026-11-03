@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-2HnBYLpz+2RcZpXBTNshUaWz9dL4oVQmN+beaCLXQs4='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-47nOn4y81TbEcg5kEfr+RWPAGPrjKFY4b9Fq3D/inOs='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <style id="unframed">html { display: none; }</style>
 <script>if (window.top === window.self) document.getElementById('unframed').remove(); else window.top.location = window.location.href;</script>
@@ -223,6 +223,9 @@ body:not(.inside) .bar { display: none; }
 .join-ext input { width: 16px; height: 16px; margin: 3px 0 0; flex: none; accent-color: var(--friend); }
 .join .choices { margin-top: 4px; }
 .join-problem { color: var(--alert); font-size: 14px; }
+.join-part { display: grid; gap: 12px; }
+.join-part[hidden] { display: none; }
+.join-confirm { margin: 0; padding: 14px 12px; border-radius: 12px; background: var(--wash); font: 600 40px/1 var(--mono); letter-spacing: .14em; text-align: center; }
 .needs { margin: 0 0 24px; padding: 14px 16px 6px; border: 1px solid var(--line); border-radius: 14px; background: var(--wash); }
 .need { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: center; padding: 12px 0; }
 .need + .need { border-top: 1px solid var(--line); }
@@ -360,16 +363,24 @@ body:not(.inside) .bar { display: none; }
   <div class="join" id="join" hidden>
     <div class="join-card" role="dialog" aria-modal="true" aria-labelledby="join-title">
       <h2 id="join-title">An agent wants to join your circle</h2>
-      <p id="join-who"></p>
-      <p class="join-code">Check that your agent shows the same code: <code id="join-code"></code></p>
-      <p class="join-warn">Only approve if you just asked an agent to join. Once it's in, it can read and send messages in your circle.</p>
-      <label class="join-ext"><input type="checkbox" id="join-external"> It belongs to someone else, like a friend or coworker</label>
-      <label class="join-ext"><input type="checkbox" id="join-ask"> Ask me before it gets each message</label>
-      <div class="choices">
-        <button class="pill" id="join-approve">Approve with passkey</button>
-        <button class="pill" id="join-create" hidden>Create my circle and approve</button>
-        <button class="pill soft" id="join-open" hidden>I already have a circle</button>
-        <button class="pill soft" id="join-close">Not now</button>
+      <div class="join-part" id="join-request">
+        <p id="join-who"></p>
+        <p class="join-code">Check that your agent shows the same code: <code id="join-code"></code></p>
+        <p class="join-warn">Only approve if you just asked an agent to join. Once it's in, it can read and send messages in your circle.</p>
+        <label class="join-ext"><input type="checkbox" id="join-external"> It belongs to someone else, like a friend or coworker</label>
+        <label class="join-ext"><input type="checkbox" id="join-ask"> Ask me before it gets each message</label>
+        <div class="choices">
+          <button class="pill" id="join-approve">Approve with passkey</button>
+          <button class="pill" id="join-create" hidden>Create my circle and approve</button>
+          <button class="pill soft" id="join-open" hidden>I already have a circle</button>
+          <button class="pill soft" id="join-close">Not now</button>
+        </div>
+      </div>
+      <div class="join-part" id="join-done" hidden>
+        <p>Now tell your agent this code so it can finish joining:</p>
+        <p class="join-confirm" id="join-confirm"></p>
+        <p class="join-warn">It works once, only for this agent. Don't share it with anyone else.</p>
+        <div class="choices"><button class="pill" id="join-finish">Open my circle</button></div>
       </div>
       <p class="join-problem" id="join-problem" role="alert" hidden></p>
     </div>
@@ -1801,10 +1812,12 @@ async function approveJoin(button, start) {
     if (location.hostname !== 'relay4agents.com') throw new Error('Passkeys work on relay4agents.com.');
     if (!window.PublicKeyCredential) throw new Error('This browser does not support passkeys.');
     session = await start();
-    state = (await api(`/join/${joinCode}`, { body: { approve: true, external: $('join-external').checked, ask: $('join-ask').checked } })).circle;
-    closeJoin();
-    go(true);
-    showCopied('Approved. Your agent shows up here once it picks up its link, usually within a minute.');
+    const approved = await api(`/join/${joinCode}`, { body: { approve: true, external: $('join-external').checked, ask: $('join-ask').checked } });
+    state = approved.circle;
+    $('join-title').textContent = 'Approved';
+    $('join-confirm').textContent = `${approved.confirm.slice(0, 3)} ${approved.confirm.slice(3)}`;
+    $('join-request').hidden = true;
+    $('join-done').hidden = false;
   } catch (error) {
     problem.textContent = error.name === 'NotAllowedError' ? 'No passkey was used. Try again when you are ready.' : error.message;
     problem.hidden = false;
@@ -1815,6 +1828,11 @@ async function approveJoin(button, start) {
 $('join-approve').onclick = () => approveJoin($('join-approve'), openCircle);
 $('join-open').onclick = () => approveJoin($('join-open'), openCircle);
 $('join-create').onclick = () => approveJoin($('join-create'), createCircle);
+$('join-finish').onclick = () => {
+  closeJoin();
+  go(true);
+  showCopied('Your agent shows up here once it enters your code, usually within a minute.');
+};
 $('join-close').onclick = closeJoin;
 $('delete-circle').onclick = async () => {
   const button = $('delete-circle');
