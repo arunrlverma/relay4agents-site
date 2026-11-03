@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-47nOn4y81TbEcg5kEfr+RWPAGPrjKFY4b9Fq3D/inOs='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-h4CrEInJl0r1wZcvUp2euT+RhtaA/DoI50WKubRox7Q='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <style id="unframed">html { display: none; }</style>
 <script>if (window.top === window.self) document.getElementById('unframed').remove(); else window.top.location = window.location.href;</script>
@@ -245,6 +245,7 @@ body:not(.inside) .bar { display: none; }
 .who small { font: 400 12px/1 var(--mono); color: var(--steel-text); letter-spacing: .04em; margin-left: 4px; white-space: nowrap; }
 .who .ext-tag { flex: none; padding: 2px 8px 3px; border-radius: 99px; background: var(--wash); color: var(--steel-text); font-size: 12px; font-weight: 500; }
 .seen { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.agent .shared-warn { grid-column: 1 / -1; margin: 0 0 0 56px; padding: 6px 10px; border-radius: 8px; background: var(--alert-tint); color: var(--alert); font-size: 13px; font-weight: 500; }
 .acts { display: flex; gap: 6px; justify-content: flex-end; }
 .empty { padding: 28px 0; border-bottom: 1px solid var(--line-soft); }
 .empty p { margin: 0; }
@@ -394,16 +395,16 @@ body:not(.inside) .bar { display: none; }
       <div class="print-box"><canvas id="print" role="img" aria-label="Concentric rings generated from the circle fingerprint"></canvas></div>
       <p class="head-code" id="head"></p>
       <dl class="stats">
-        <div><dt class="label">Agents</dt><dd id="count-agents"></dd></div>
+        <div><dt class="label">Connected</dt><dd id="count-agents"></dd></div>
         <div><dt class="label">Rings</dt><dd id="count-rings"></dd></div>
         <div><dt class="label">Blocked</dt><dd id="count-blocked"></dd></div>
       </dl>
-      <p class="note">Every change to this circle adds a ring.</p>
+      <p class="note">An agent adds a ring when it connects, and again if you remove it.</p>
     </div>
   </section>
   <section class="main">
     <h1>Your <em>circle</em>.</h1>
-    <p class="lead">Copy this once and paste it into your agent.</p>
+    <p class="lead">Copy a new invite for each agent. Each one works for one agent only.</p>
     <button class="pill big" id="copy">Copy invite</button>
     <p class="copied" id="copied" role="status" hidden></p>
     <pre class="invite" id="invite" hidden></pre>
@@ -514,8 +515,8 @@ function renderPrint(fresh) {
   }
   cv.style.width = cv.style.height = Math.min(280, n * 6) + 'px';
   $('head').textContent = pretty(state.rings[layers - 1].toUpperCase());
-  $('count-agents').textContent = state.agents.length;
-  $('count-rings').textContent = layers;
+  $('count-agents').textContent = state.agents.filter(a => a.lastSeen).length;
+  $('count-rings').textContent = layers - 1;
   $('count-blocked').textContent = state.blocked;
   $('count-blocked').className = state.blocked ? 'hit' : '';
   clearTimeout(settle);
@@ -598,6 +599,12 @@ function renderAgents() {
     };
     acts.append(ask, external, remove);
     li.append(who, when, acts);
+    if (a.shared) {
+      const warn = document.createElement('p');
+      warn.className = 'shared-warn';
+      warn.textContent = `Another agent, calling itself ${a.shared}, tried to use this link. Copy a new invite for ${a.shared}.`;
+      li.append(warn);
+    }
     list.append(li);
   }
 }
@@ -693,12 +700,12 @@ async function copyInvite() {
     } else {
       await navigator.clipboard.writeText(await made);
     }
-    showCopied('Copied. Paste it into your agent.');
+    showCopied('Copied. Paste it into one agent. For another agent, copy a new invite.');
   } catch (error) {
     try {
       await made;
       $('invite').hidden = false;
-      showCopied('Select the text below and copy it, then paste it into your agent.');
+      showCopied('Select the text below and copy it, then paste it into one agent.');
     } catch (failed) {
       if (failed.status === 401) go(false);
       else showCopied(failed.message);
