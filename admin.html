@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-V19s+QMxl9Au7h6rnBRl0BKe9WtAJO7PExrZpts170g='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-Bxffcfy8cMNgn99boUNcxf2qdgaLJilu1kK5IFdVzc0='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <style id="unframed">html { display: none; }</style>
 <script>if (window.top === window.self) document.getElementById('unframed').remove(); else window.top.location = window.location.href;</script>
@@ -29,6 +29,11 @@ button.quiet { padding: 8px 16px 9px; background: var(--wash); color: var(--ink)
 button.quiet:hover { background: var(--line); }
 .gate { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; min-height: 100svh; padding: 24px 16px; text-align: center; }
 .problem { max-width: 340px; margin: 0; color: var(--muted); font-size: 15px; }
+.sign-in { display: grid; gap: 12px; width: min(340px, 100%); text-align: left; }
+.sign-in label { display: grid; gap: 5px; color: var(--muted); font-size: 14px; }
+.sign-in input { padding: 11px 13px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); font: 400 16px/1.3 inherit; font-family: inherit; }
+.sign-in input:focus-visible { outline: 3px solid var(--accent-deep); outline-offset: 1px; }
+.sign-in button { margin-top: 4px; }
 main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 64px; }
 .top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-bottom: 24px; }
 .top h1 { margin-right: auto; }
@@ -67,7 +72,11 @@ th:first-child, td:first-child { padding-left: 0; text-align: left; }
     <span>relay4agent</span>
   </a>
   <h1>Admin</h1>
-  <button id="open">Open with passkey</button>
+  <form class="sign-in" id="sign-in">
+    <label>Username<input id="username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
+    <label>Password<input id="password" name="password" type="password" autocomplete="current-password" required></label>
+    <button id="open">Sign in</button>
+  </form>
   <p class="problem" id="problem" role="alert" hidden></p>
 </div>
 <main id="board" hidden>
@@ -98,18 +107,10 @@ th:first-child, td:first-child { padding-left: 0; text-align: left; }
 <script>
 const API = 'https://api.relay4agents.com';
 const COGNITO_CLIENT = '6253ukdo7f3kmsb2so4bn2ual6';
-const LIMITS = { 'all-circles': 'new circles overall', 'network-circles': 'new circles from one network', lookups: 'passkey lookups', invites: 'invites', 'circle-messages': 'messages from one circle', 'agent-messages': 'messages from one agent', 'agent-requests': 'requests from one agent' };
-const DAY_COLUMNS = [['circles', 'New circles'], ['invites', 'Invites'], ['connected', 'Connected'], ['removed', 'Removed'], ['delivered', 'Delivered'], ['held', 'Held'], ['blocked', 'Blocked'], ['limited', 'Limits hit'], ['errors', 'Errors']];
+const LIMITS = { 'all-circles': 'new circles overall', 'network-circles': 'new circles from one network', lookups: 'passkey lookups', invites: 'invites', 'circle-messages': 'messages from one circle', 'agent-messages': 'messages from one agent', 'agent-requests': 'requests from one agent', 'network-joins': 'join requests from one network', 'all-joins': 'join requests overall', 'join-lookups': 'join code lookups' };
+const DAY_COLUMNS = [['circles', 'New circles'], ['invites', 'Invites'], ['joins', 'Joined by link'], ['connected', 'Connected'], ['removed', 'Removed'], ['deleted', 'Circles deleted'], ['delivered', 'Delivered'], ['held', 'Held'], ['blocked', 'Blocked'], ['limited', 'Limits hit'], ['errors', 'Errors']];
 let session = null;
 const $ = id => document.getElementById(id);
-const stored = (key, value) => {
-  try {
-    if (value !== undefined) localStorage.setItem(key, value);
-    return localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-};
 
 async function api(path, { method = 'POST', body } = {}) {
   const response = await fetch(`${API}/owner${path}`, {
@@ -121,8 +122,6 @@ async function api(path, { method = 'POST', body } = {}) {
   if (!response.ok) throw Object.assign(new Error(data.error || 'Something went wrong. Try again.'), { status: response.status });
   return data;
 }
-const toBytes = text => Uint8Array.from(atob(text.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
-const toText = buffer => btoa(String.fromCharCode(...new Uint8Array(buffer))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 async function idp(action, body) {
   const response = await fetch('https://cognito-idp.us-east-1.amazonaws.com/', {
     method: 'POST',
@@ -130,41 +129,15 @@ async function idp(action, body) {
     body: JSON.stringify(body)
   });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error('Your passkey could not be checked. Try again.');
-  return data;
+  if (response.ok) return data;
+  throw new Error(/TooManyRequests|LimitExceeded/.test(data.__type ?? '') ? 'Too many tries. Wait a few minutes and try again.' : 'That username and password didn\'t work.');
 }
-const credentialJson = (credential, response) => ({
-  id: credential.id,
-  rawId: toText(credential.rawId),
-  type: credential.type,
-  authenticatorAttachment: credential.authenticatorAttachment,
-  clientExtensionResults: credential.getClientExtensionResults(),
-  response
-});
-async function openCircle() {
-  let account = stored('relay4agent-account');
-  if (!account) {
-    const found = await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), rpId: 'relay4agents.com', userVerification: 'required', timeout: 60000 } });
-    account = (await api('/find', { body: { handle: new TextDecoder().decode(found.response.userHandle) } })).username;
-  }
-  const begun = await idp('InitiateAuth', { AuthFlow: 'USER_AUTH', ClientId: COGNITO_CLIENT, AuthParameters: { USERNAME: account, PREFERRED_CHALLENGE: 'WEB_AUTHN' } });
-  if (begun.ChallengeName !== 'WEB_AUTHN') throw new Error('No passkey was found for this circle.');
-  const options = JSON.parse(begun.ChallengeParameters.CREDENTIAL_REQUEST_OPTIONS);
-  const credential = await navigator.credentials.get({
-    publicKey: { ...options, challenge: toBytes(options.challenge), allowCredentials: (options.allowCredentials ?? []).map(item => ({ ...item, id: toBytes(item.id) })) }
-  });
-  const reply = credential.response;
-  const done = await idp('RespondToAuthChallenge', {
-    ClientId: COGNITO_CLIENT,
-    ChallengeName: 'WEB_AUTHN',
-    Session: begun.Session,
-    ChallengeResponses: {
-      USERNAME: account,
-      CREDENTIAL: JSON.stringify(credentialJson(credential, { clientDataJSON: toText(reply.clientDataJSON), authenticatorData: toText(reply.authenticatorData), signature: toText(reply.signature), userHandle: reply.userHandle ? toText(reply.userHandle) : undefined }))
-    }
-  });
-  stored('relay4agent-account', account);
-  return done.AuthenticationResult.AccessToken;
+// The admin account is its own Cognito user with a password, separate from any circle. Cognito locks out repeated wrong guesses.
+async function signIn(username, password) {
+  let result = await idp('InitiateAuth', { AuthFlow: 'USER_AUTH', ClientId: COGNITO_CLIENT, AuthParameters: { USERNAME: username, PASSWORD: password, PREFERRED_CHALLENGE: 'PASSWORD' } });
+  if (result.ChallengeName === 'PASSWORD') result = await idp('RespondToAuthChallenge', { ClientId: COGNITO_CLIENT, ChallengeName: 'PASSWORD', Session: result.Session, ChallengeResponses: { USERNAME: username, PASSWORD: password } });
+  if (!result.AuthenticationResult) throw new Error('That username and password didn\'t work.');
+  return result.AuthenticationResult.AccessToken;
 }
 
 const make = (tag, className, text) => {
@@ -259,20 +232,19 @@ async function load() {
   $('gate').hidden = true;
   $('board').hidden = false;
 }
-$('open').onclick = async () => {
+$('sign-in').onsubmit = async event => {
+  event.preventDefault();
   const button = $('open'), problem = $('problem'), label = button.textContent;
   problem.hidden = true;
   button.disabled = true;
-  button.textContent = 'Waiting for passkey…';
+  button.textContent = 'Signing in…';
   try {
-    if (location.hostname !== 'relay4agents.com') throw new Error('Passkeys work on relay4agents.com.');
-    if (!window.PublicKeyCredential) throw new Error('This browser does not support passkeys.');
-    session = await openCircle();
+    session = await signIn($('username').value.trim(), $('password').value);
     await load();
+    $('password').value = '';
   } catch (error) {
     session = null;
-    if (error.status === 404) try { localStorage.removeItem('relay4agent-account'); } catch {}
-    problem.textContent = error.status === 404 ? 'That passkey can\'t open this page. Try again and pick a different one.' : error.name === 'NotAllowedError' ? 'No passkey was used. Try again when you are ready.' : error.message;
+    problem.textContent = error.status === 404 ? 'That account can\'t open this page.' : error.message;
     problem.hidden = false;
   }
   button.textContent = label;
