@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-Bxffcfy8cMNgn99boUNcxf2qdgaLJilu1kK5IFdVzc0='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-Fej4bFnyHMuN14NejmR6Gn/Fidf7qHEqDqtjAl1TeTo='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <style id="unframed">html { display: none; }</style>
 <script>if (window.top === window.self) document.getElementById('unframed').remove(); else window.top.location = window.location.href;</script>
@@ -62,6 +62,8 @@ table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-nu
 th { padding: 7px 10px; border-bottom: 1px solid var(--line); color: var(--muted); font-weight: 500; text-align: right; white-space: nowrap; }
 td { padding: 8px 10px; border-bottom: 1px solid var(--wash); text-align: right; white-space: nowrap; }
 th:first-child, td:first-child { padding-left: 0; text-align: left; }
+th.text, td.text { text-align: left; }
+tr.yours td { color: var(--muted); }
 .foot { margin: 12px 0 0; color: var(--muted); font-size: 13px; }
 </style>
 </head>
@@ -97,6 +99,11 @@ th:first-child, td:first-child { padding-left: 0; text-align: left; }
   <section>
     <h2>Each day</h2>
     <div class="scroll"><table id="days"></table></div>
+  </section>
+  <section>
+    <h2>Networks</h2>
+    <div class="scroll"><table id="networks"></table></div>
+    <p class="foot" id="networks-foot"></p>
   </section>
   <section>
     <h2>Circles</h2>
@@ -193,15 +200,16 @@ function chart(title, days, field) {
   box.append(head, bars, ends);
   return box;
 }
-function table(target, headings, rows) {
-  const head = make('tr');
-  for (const heading of headings) head.append(make('th', '', heading));
-  target.replaceChildren(head, ...rows.map(cells => {
-    const row = make('tr');
-    for (const cell of cells) row.append(make('td', '', cell));
+function table(target, headings, rows, { text = [], yours = () => false } = {}) {
+  const head = make('tr'), align = index => (text.includes(index) ? 'text' : '');
+  headings.forEach((heading, index) => head.append(make('th', align(index), heading)));
+  target.replaceChildren(head, ...rows.map((cells, at) => {
+    const row = make('tr', yours(at) ? 'yours' : '');
+    cells.forEach((cell, index) => row.append(make('td', align(index), cell)));
     return row;
   }));
 }
+const networkLabel = item => (item.network ? `${item.network}${item.yours ? ' (you)' : ''}` : 'Not recorded');
 function noteFor(days) {
   const today = days.at(-1), parts = [];
   if (today.errors) parts.push(`${number(today.errors)} ${today.errors === 1 ? 'error' : 'errors'} today`);
@@ -211,10 +219,11 @@ function noteFor(days) {
   return recent ? 'Nothing today. There were limits hit or errors earlier, shown in the table below.' : 'No errors or limits hit in the last 14 days.';
 }
 function show(view) {
-  const { totals, hour, spend, days, circles, hidden } = view;
+  const { totals, hour, spend, days, networks, circles, hidden } = view;
   $('updated').textContent = `Updated ${when(view.at)}`;
   $('tiles').replaceChildren(
     tile('Circles', number(totals.circles), `${number(totals.active)} active in the last day`),
+    tile('Networks', number(totals.networks), `${number(totals.yours)} ${totals.yours === 1 ? 'circle' : 'circles'} from your network`),
     tile('Agents connected', number(totals.connected), `of ${number(totals.agents)} invited`),
     tile('Messages stored', number(totals.messages), 'from the last 3 days'),
     tile('Waiting on owners', number(totals.waiting), 'held messages'),
@@ -224,7 +233,10 @@ function show(view) {
   $('note').textContent = noteFor(days);
   $('charts').replaceChildren(chart('New circles', days, 'circles'), chart('Messages delivered', days, 'delivered'));
   table($('days'), ['Day (UTC)', ...DAY_COLUMNS.map(column => column[1])], [...days].reverse().map(day => [dayName(day.day), ...DAY_COLUMNS.map(([field]) => number(field === 'limited' ? limited(day) : day[field]))]));
-  table($('circles'), ['Circle', 'Created', 'Agents', 'Connected', 'Last active', 'Messages', 'Waiting'], circles.map(circle => [circle.ref, when(circle.createdAt), number(circle.agents), number(circle.connected), when(circle.lastSeen), number(circle.messages), number(circle.waiting)]));
+  table($('networks'), ['Network', 'Devices', 'Circles', 'Agents connected', 'Latest circle'], networks.map(group => [networkLabel(group), group.devices.join(', '), number(group.circles), number(group.connected), when(group.latest)]), { text: [1], yours: at => networks[at].yours });
+  $('networks').hidden = !networks.length;
+  $('networks-foot').textContent = `A network is a short salted hash of the connection a circle was made from, not its IP address. Circles from one network are probably one person, though a shared office or phone network can mix people. The network you're on now is marked (you) and greyed out.${totals.unrecorded ? ` ${number(totals.unrecorded)} older ${totals.unrecorded === 1 ? 'circle was' : 'circles were'} made before networks were recorded.` : ''}`;
+  table($('circles'), ['Circle', 'Created', 'Network', 'Device', 'Agents', 'Connected', 'Last active', 'Messages', 'Waiting'], circles.map(circle => [circle.ref, when(circle.createdAt), networkLabel(circle), circle.device ?? 'Not recorded', number(circle.agents), number(circle.connected), when(circle.lastSeen), number(circle.messages), number(circle.waiting)]), { text: [2, 3], yours: at => circles[at].yours });
   $('foot').textContent = `${number(hidden)} test ${hidden === 1 ? 'circle is' : 'circles are'} hidden. Daily counts began when this page launched.`;
 }
 async function load() {
