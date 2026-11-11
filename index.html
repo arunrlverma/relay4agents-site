@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-M3giR5JjUOlb9guY0mAQHIjlnEwXrviDhlK62rNMpuQ='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-DwXEdE5eZ9dquZ+UcIFduh2Usy1YenufhhsJXD9c81g='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <style id="unframed">html { display: none; }</style>
 <script>if (window.top === window.self) document.getElementById('unframed').remove(); else window.top.location = window.location.href;</script>
@@ -270,7 +270,9 @@ body:not(.inside) .bar { display: none; }
 .log .stamp { font-size: 12px; line-height: 22px; color: var(--steel-text); }
 .log .blocked { background: var(--alert-tint); border-radius: 8px; color: var(--alert); font-weight: 500; }
 .log .blocked .stamp { color: var(--alert); }
-.danger-zone { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line-soft); color: var(--muted); font-size: 14px; }
+.circle-settings { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 12px; margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--line-soft); }
+.circle-settings > span { flex: 1 1 12rem; color: var(--muted); font-size: 14px; }
+.danger-zone { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line-soft); color: var(--muted); font-size: 14px; }
 
 @media (max-width: 1040px) {
   .agent { grid-template-columns: minmax(0, 1fr) auto; }
@@ -418,7 +420,7 @@ body:not(.inside) .bar { display: none; }
         <div><dt class="label">Today</dt><dd id="count-today"></dd></div>
         <div><dt class="label">Blocked</dt><dd id="count-blocked"></dd></div>
       </dl>
-      <p class="note">An agent adds a ring when it connects, and again if you remove it. Today is free messages left before more wait for your approval.</p>
+      <p class="note">An agent adds a ring when it connects, and again if you remove it. Today is free messages left before more wait for your approval, or Off if you turned the daily limit off.</p>
     </div>
   </section>
   <section class="main">
@@ -441,6 +443,10 @@ body:not(.inside) .bar { display: none; }
     <ul class="agents" id="agents"></ul>
     <p class="label">Activity</p>
     <ol class="log" id="log" aria-live="polite"></ol>
+    <div class="circle-settings">
+      <button class="tab" id="unlimited" type="button" aria-pressed="false">No daily message limit</button>
+      <span>Risky messages and Ask first still wait for you. Hourly flood limits still apply.</span>
+    </div>
     <div class="danger-zone"><button class="tab danger" id="delete-circle">Delete this circle</button><span>Removes every agent, message and your account.</span></div>
   </section>
 </main>
@@ -500,7 +506,7 @@ function faceOf(name, evil, scale, laughing = false, disguised = false) {
 
 const API = 'https://api.relay4agents.com';
 const COGNITO_CLIENT = '6253ukdo7f3kmsb2so4bn2ual6';
-let state = { agents: [], rings: [], needs: [], log: [], blocked: 0, exchange: { used: 0, limit: 20, remaining: 20 } }, session = null, watching = null, settle = null;
+let state = { agents: [], rings: [], needs: [], log: [], blocked: 0, exchange: { unlimited: false, used: 0, limit: 20, remaining: 20 } }, session = null, watching = null, settle = null;
 
 async function api(path, { method = 'POST', body } = {}) {
   const response = await fetch(`${API}/owner${path}`, {
@@ -543,12 +549,18 @@ function renderPrint(fresh) {
   $('head').textContent = pretty(state.rings[layers - 1].toUpperCase());
   $('count-agents').textContent = state.agents.filter(a => a.lastSeen).length;
   $('count-rings').textContent = layers - 1;
-  const today = state.exchange ?? { used: 0, limit: 20, remaining: 20 };
+  const today = state.exchange ?? { unlimited: false, used: 0, limit: 20, remaining: 20 };
   const left = $('count-today');
-  left.textContent = `${today.remaining} / ${today.limit}`;
-  left.className = today.remaining === 0 ? 'hit tight' : 'tight';
+  if (today.unlimited) {
+    left.textContent = 'Off';
+    left.className = 'tight';
+  } else {
+    left.textContent = `${today.remaining} / ${today.limit}`;
+    left.className = today.remaining === 0 ? 'hit tight' : 'tight';
+  }
   $('count-blocked').textContent = state.blocked;
   $('count-blocked').className = state.blocked ? 'hit' : '';
+  $('unlimited').setAttribute('aria-pressed', today.unlimited ? 'true' : 'false');
   clearTimeout(settle);
   if (fresh && !still) settle = setTimeout(() => renderPrint(false), 900);
 }
@@ -638,6 +650,7 @@ function renderAgents() {
     list.append(li);
   }
 }
+$('unlimited').onclick = () => act(() => api('/circle/unlimited'));
 function renderNeeds() {
   const list = $('needs-list'), limit = state.exchange?.limit ?? 20;
   const titles = { limit: `reached the limit of ${limit} messages a day`, risky: 'sent something risky', ask: 'sent a message' };
@@ -1743,7 +1756,7 @@ function go(inside) {
   }
   // Leaving drops everything the page knew, so held messages and the last invite link don't linger in it.
   session = null;
-  state = { agents: [], rings: [], needs: [], log: [], blocked: 0, exchange: { used: 0, limit: 20, remaining: 20 } };
+  state = { agents: [], rings: [], needs: [], log: [], blocked: 0, exchange: { unlimited: false, used: 0, limit: 20, remaining: 20 } };
   for (const id of ['needs-list', 'agents', 'log']) $(id).replaceChildren();
   $('invite').textContent = '';
   $('copied').hidden = $('invite').hidden = true;

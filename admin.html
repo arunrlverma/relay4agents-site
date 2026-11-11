@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-hKdHeq4MSfAULeh4I5DwVf/cz7PBJcKtPes+wVJWPfQ='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-RBFVhtSq19LR+xm3aRloM02/0Z3YIm5lOGCYmnCe5+o='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <style id="unframed">html { display: none; }</style>
 <script>if (window.top === window.self) document.getElementById('unframed').remove(); else window.top.location = window.location.href;</script>
@@ -236,7 +236,7 @@ function show(view) {
   table($('networks'), ['Network', 'Devices', 'Circles', 'Agents connected', 'Latest circle'], networks.map(group => [networkLabel(group), group.devices.join(', '), number(group.circles), number(group.connected), when(group.latest)]), { text: [1], yours: at => networks[at].yours });
   $('networks').hidden = !networks.length;
   $('networks-foot').textContent = `A network is a short salted hash of the connection a circle was made from, not its IP address. Circles from one network are probably one person, though a shared office or phone network can mix people. The network you're on now is marked (you) and greyed out.${totals.unrecorded ? ` ${number(totals.unrecorded)} older ${totals.unrecorded === 1 ? 'circle was' : 'circles were'} made before networks were recorded.` : ''}`;
-  table($('circles'), ['Circle', 'Created', 'Network', 'Device', 'Agents', 'Connected', 'Last active', 'Messages', 'Today', 'Waiting'], circles.map(circle => [circle.ref, when(circle.createdAt), networkLabel(circle), circle.device ?? 'Not recorded', number(circle.agents), number(circle.connected), when(circle.lastSeen), number(circle.messages), `${number(circle.today)} / ${number(circle.cap)}`, number(circle.waiting)]), { text: [2, 3], yours: at => circles[at].yours });
+  table($('circles'), ['Circle', 'Created', 'Network', 'Device', 'Agents', 'Connected', 'Last active', 'Messages', 'Today', 'Waiting'], circles.map(circle => [circle.ref, when(circle.createdAt), networkLabel(circle), circle.device ?? 'Not recorded', number(circle.agents), number(circle.connected), when(circle.lastSeen), number(circle.messages), circle.unlimited ? 'Unlimited' : `${number(circle.today)} / ${number(circle.cap)}`, number(circle.waiting)]), { text: [2, 3], yours: at => circles[at].yours });
   $('foot').textContent = `${number(hidden)} test ${hidden === 1 ? 'circle is' : 'circles are'} hidden. Daily counts began when this page launched.`;
 }
 async function load() {
