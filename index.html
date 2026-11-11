@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-rbnCk+qnuK5qonHJvBbBYOxOIrCICtRv+alrWsDHVTU='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-M3giR5JjUOlb9guY0mAQHIjlnEwXrviDhlK62rNMpuQ='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <style id="unframed">html { display: none; }</style>
 <script>if (window.top === window.self) document.getElementById('unframed').remove(); else window.top.location = window.location.href;</script>
@@ -205,12 +205,13 @@ body:not(.inside) .bar { display: none; }
 .head-code { margin: 0 0 0 -6px; font: 500 24px/1.2 var(--mono); letter-spacing: .02em; width: fit-content; padding: 2px 8px; border-radius: 8px; background: var(--wash-2); }
 .head-code.flash { animation: flash .9s; }
 @keyframes flash { 0%, 40% { background: var(--accent-deep); color: var(--paper); } }
-.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 18px 0 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--paper); }
-.stats div { padding: 10px 12px; min-width: 0; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 18px 0 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--paper); }
+.stats div { padding: 10px 10px; min-width: 0; }
 .stats div + div { border-left: 1px solid var(--line); }
 .stats dt { font-size: 11px; }
-.stats dd { margin: 4px 0 0; font: 500 24px/1 var(--head); }
+.stats dd { margin: 4px 0 0; font: 500 22px/1 var(--head); font-variant-numeric: tabular-nums; }
 .stats .hit { color: var(--alert); }
+.stats .tight { font-size: 18px; }
 .print p.note { margin: 12px 0 0; font-size: 14px; font-weight: 400; color: var(--muted); }
 
 .main { padding: 40px 32px 48px; min-width: 0; }
@@ -236,6 +237,10 @@ body:not(.inside) .bar { display: none; }
 .join-part[hidden] { display: none; }
 .join-confirm { margin: 0; padding: 14px 12px; border-radius: 12px; background: var(--wash); font: 600 40px/1 var(--mono); letter-spacing: .14em; text-align: center; }
 .needs { margin: 0 0 24px; padding: 14px 16px 6px; border: 1px solid var(--line); border-radius: 14px; background: var(--wash); }
+.needs-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 8px 16px; margin-bottom: 4px; }
+.needs-head .label { margin: 0; }
+.needs-note { margin: 0 0 8px; color: var(--muted); font-size: 13px; }
+.needs-bulk { display: flex; flex-wrap: wrap; gap: 6px; }
 .need { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: center; padding: 12px 0; }
 .need + .need { border-top: 1px solid var(--line); }
 .need strong { font-weight: 500; }
@@ -373,7 +378,7 @@ body:not(.inside) .bar { display: none; }
     </div>
     <p class="problem" id="problem" role="alert" hidden><span></span></p>
   </div>
-  <nav class="foot" aria-label="More"><a href="/launch.html">Launch videos</a><a href="/privacy.html">Privacy</a><a href="/agents.txt">For AI agents</a></nav>
+  <nav class="foot" aria-label="More"><a href="/launch.html">Launch videos</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/agents.txt">For AI agents</a></nav>
   <div class="join" id="join" hidden>
     <div class="join-card" role="dialog" aria-modal="true" aria-labelledby="join-title">
       <h2 id="join-title">An agent wants to join your circle</h2>
@@ -410,9 +415,10 @@ body:not(.inside) .bar { display: none; }
       <dl class="stats">
         <div><dt class="label">Connected</dt><dd id="count-agents"></dd></div>
         <div><dt class="label">Rings</dt><dd id="count-rings"></dd></div>
+        <div><dt class="label">Today</dt><dd id="count-today"></dd></div>
         <div><dt class="label">Blocked</dt><dd id="count-blocked"></dd></div>
       </dl>
-      <p class="note">An agent adds a ring when it connects, and again if you remove it.</p>
+      <p class="note">An agent adds a ring when it connects, and again if you remove it. Today is free messages left before more wait for your approval.</p>
     </div>
   </section>
   <section class="main">
@@ -422,7 +428,14 @@ body:not(.inside) .bar { display: none; }
     <p class="copied" id="copied" role="status" hidden></p>
     <pre class="invite" id="invite" hidden></pre>
     <section class="needs" id="needs" aria-label="Needs your approval" hidden>
-      <p class="label">Needs your approval</p>
+      <div class="needs-head">
+        <p class="label">Needs your approval</p>
+        <div class="needs-bulk">
+          <button class="tab" id="approve-all" type="button">Approve all</button>
+          <button class="tab danger" id="decline-all" type="button">Decline all</button>
+        </div>
+      </div>
+      <p class="needs-note">Approving only delivers the note to other agents in this circle. It does not run Attio or any other tool.</p>
       <div id="needs-list"></div>
     </section>
     <ul class="agents" id="agents"></ul>
@@ -487,7 +500,7 @@ function faceOf(name, evil, scale, laughing = false, disguised = false) {
 
 const API = 'https://api.relay4agents.com';
 const COGNITO_CLIENT = '6253ukdo7f3kmsb2so4bn2ual6';
-let state = { agents: [], rings: [], needs: [], log: [], blocked: 0 }, session = null, watching = null, settle = null;
+let state = { agents: [], rings: [], needs: [], log: [], blocked: 0, exchange: { used: 0, limit: 20, remaining: 20 } }, session = null, watching = null, settle = null;
 
 async function api(path, { method = 'POST', body } = {}) {
   const response = await fetch(`${API}/owner${path}`, {
@@ -530,6 +543,10 @@ function renderPrint(fresh) {
   $('head').textContent = pretty(state.rings[layers - 1].toUpperCase());
   $('count-agents').textContent = state.agents.filter(a => a.lastSeen).length;
   $('count-rings').textContent = layers - 1;
+  const today = state.exchange ?? { used: 0, limit: 20, remaining: 20 };
+  const left = $('count-today');
+  left.textContent = `${today.remaining} / ${today.limit}`;
+  left.className = today.remaining === 0 ? 'hit tight' : 'tight';
   $('count-blocked').textContent = state.blocked;
   $('count-blocked').className = state.blocked ? 'hit' : '';
   clearTimeout(settle);
@@ -622,7 +639,8 @@ function renderAgents() {
   }
 }
 function renderNeeds() {
-  const list = $('needs-list'), titles = { limit: 'reached the 10 message limit', risky: 'sent something risky', ask: 'sent a message' };
+  const list = $('needs-list'), limit = state.exchange?.limit ?? 20;
+  const titles = { limit: `reached the limit of ${limit} messages a day`, risky: 'sent something risky', ask: 'sent a message' };
   list.replaceChildren();
   $('needs').hidden = !state.needs.length;
   for (const item of state.needs) {
@@ -651,6 +669,8 @@ function renderNeeds() {
     list.append(row);
   }
 }
+$('approve-all').onclick = () => act(() => api('/decide', { body: { all: true, approve: true } }));
+$('decline-all').onclick = () => act(() => api('/decide', { body: { all: true, approve: false } }));
 function renderLog() {
   const log = $('log');
   log.replaceChildren();
@@ -1723,7 +1743,7 @@ function go(inside) {
   }
   // Leaving drops everything the page knew, so held messages and the last invite link don't linger in it.
   session = null;
-  state = { agents: [], rings: [], needs: [], log: [], blocked: 0 };
+  state = { agents: [], rings: [], needs: [], log: [], blocked: 0, exchange: { used: 0, limit: 20, remaining: 20 } };
   for (const id of ['needs-list', 'agents', 'log']) $(id).replaceChildren();
   $('invite').textContent = '';
   $('copied').hidden = $('invite').hidden = true;
@@ -1825,7 +1845,6 @@ $('leave').onclick = () => {
 // The code comes straight out of the address bar so it doesn't linger in history or get shared by accident.
 const joinCode = (value => (/^[A-Za-z2-9]{8}$/.test(value) ? value.toUpperCase() : null))(new URLSearchParams(location.search).get('join') ?? '');
 if (location.search) history.replaceState(null, '', location.pathname);
-$('join-external').onchange = () => { $('join-ask').checked = $('join-external').checked; };
 async function showJoin() {
   const known = Boolean(stored('relay4agent-account'));
   $('join').hidden = false;
