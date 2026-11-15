@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-hWte6Fbj9byREJVf+Gp58frjA6pCne0Je7rr0ewnz3Q='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nE+xCR0Y9IBPa+yC52Bwu/naOzrHbq/9rOLGwh5M8+0=' 'sha256-nkBidq9jpk/Liq72R2fU++3xp/OKiCKRMYmelZhJsU0='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src https://api.relay4agents.com https://cognito-idp.us-east-1.amazonaws.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <style id="unframed">html { display: none; }</style>
 <script>if (window.top === window.self) document.getElementById('unframed').remove(); else window.top.location = window.location.href;</script>
@@ -1216,7 +1216,7 @@ function renderSheet(force = false) {
   for (const l of stuck) {
     const answered = l.note && l.noteAt > l.at, li = inn(el('li', answered ? 'answered' : ''));
     li.append(el('b', '', l.name), ' is blocked on ', el('em', '', l.topic), `: ${l.blockers}`);
-    if (answered) li.append(el('span', 'p-do', `You answered. ${l.noteSeen ? `${l.name} has read it.` : `Waiting for ${l.name} to read it.`}`));
+    if (answered) li.append(el('i', '', ` — you answered, and ${l.noteSeen ? `${l.name} has read it.` : `${l.name} hasn’t read it yet.`}`));
     else {
       const acts = el('span', 'p-do');
       acts.append(link('Answer', () => {
